@@ -1,0 +1,7 @@
+apiVersion: v2
+name: grafana
+description: >
+  A helm chart to deploy a Grafana instance using the Grafana community operator
+type: application
+version: 0.1.0
+appVersion: 0.1.0

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: cluster-monitoring
+description: >
+  A helm chart to configure cluster monitoring settings
+type: application
+version: 0.1.0
+appVersion: 0.1.0

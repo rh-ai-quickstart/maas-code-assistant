@@ -1,0 +1,4 @@
+global:
+  toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+
+operators: {}

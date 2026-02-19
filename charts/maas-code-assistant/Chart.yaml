@@ -1,0 +1,18 @@
+apiVersion: v2
+name: maas-code-assistant
+description: A chart to deploy a code assistant, integrating MaaS from OpenShift AI with OpenShift DevSpaces
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: openshift-ai
+    condition: openshift-ai.enabled
+  - name: devspaces
+    condition: devspaces.enabled
+  - name: grafana
+    condition: grafana.enabled
+  - name: cluster-monitoring
+    condition: cluster-monitoring.enabled
+  - name: keycloak
+    condition: keycloak.enabled

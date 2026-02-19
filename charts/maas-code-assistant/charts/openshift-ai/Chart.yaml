@@ -1,0 +1,7 @@
+apiVersion: v2
+name: openshift-ai
+description: >
+  A helm chart to deploy and configure OpenShift AI to support MaaS
+type: application
+version: 0.1.0
+appVersion: 0.1.0

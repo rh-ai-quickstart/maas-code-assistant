@@ -1,0 +1,13 @@
+apiVersion: org.eclipse.che/v2
+kind: CheCluster
+metadata:
+  name: devspaces
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+spec:
+  components: {}
+  networking: {}
+  devEnvironments:
+    startTimeoutSeconds: 1200
+    secondsOfInactivityBeforeIdling: -1

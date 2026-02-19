@@ -1,0 +1,86 @@
+global:
+  toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+
+dataScienceCluster:
+  create: true
+  components:
+    aipipelines:
+      argoWorkflowsControllers:
+        managementState: Removed
+      managementState: Removed
+    dashboard:
+      managementState: Managed
+    feastoperator:
+      managementState: Removed
+    kserve:
+      nim:
+        managementState: Removed
+      rawDeploymentServiceConfig: Headless
+      managementState: Managed
+    kueue:
+      defaultClusterQueueName: default
+      defaultLocalQueueName: default
+      managementState: Removed
+    llamastackoperator:
+      managementState: Managed
+    mlflowoperator:
+      managementState: Removed
+    modelregistry:
+      registriesNamespace: rhoai-model-registries
+      managementState: Managed
+    ray:
+      managementState: Removed
+    trainingoperator:
+      managementState: Removed
+    trustyai:
+      eval:
+        lmeval:
+          permitCodeExecution: deny
+          permitOnline: deny
+      managementState: Managed
+    workbenches:
+      workbenchNamespace: rhods-notebooks
+      managementState: Managed
+
+rhcl:
+  create: true
+  namespace: kuadrant-system
+
+install-operators:
+  enabled: true
+  operators:
+    devspaces:
+      enabled: true
+      channel: stable
+
+    grafana-operator:
+      enabled: true
+      channel: v5
+      catalog: community-operators
+
+    rhods-operator:
+      enabled: true
+      channel: fast-3.x
+      installPlanApproval: Manual
+      startingCSV: rhods-operator.3.2.0
+      namespace: redhat-ods-operator
+      operatorGroup:
+        enabled: true
+
+    rhcl-operator:
+      enabled: true
+      channel: stable
+
+    cloudnative-pg:
+      enabled: true
+      channel: stable-v1
+      catalog: certified-operators
+
+    rhbk-operator:
+      enabled: true
+      channel: stable-v26.4
+      namespace: keycloak
+      operatorGroup:
+        enabled: true
+      targetNamespaces:
+        - keycloak

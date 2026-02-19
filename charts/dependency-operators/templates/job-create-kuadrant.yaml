@@ -1,0 +1,105 @@
+{{- if .Values.rhcl.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.rhcl.namespace }}
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: create-kuadrant
+  namespace: {{ .Values.rhcl.namespace }}
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-kuadrant-kuadrant-admin
+  namespace: {{ .Values.rhcl.namespace }}
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kuadrants.kuadrant.io-v1beta1-admin
+subjects:
+  - kind: ServiceAccount
+    name: create-kuadrant
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-kuadrant-olm-view
+  namespace: openshift-operators
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aggregate-olm-view
+subjects:
+  - kind: ServiceAccount
+    name: create-kuadrant
+    namespace: {{ .Values.rhcl.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-kuadrant-namespace-edit
+  namespace: openshift-operators
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: create-kuadrant
+    namespace: {{ .Values.rhcl.namespace }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: create-kuadrant-script
+  namespace: {{ .Values.rhcl.namespace }}
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+data:
+{{ tpl (.Files.Glob "files/rhcl/*").AsConfig $ | indent 2 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-kuadrant
+  namespace: {{ .Values.rhcl.namespace }}
+  labels:
+    {{- include "dependency-operators.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccountName: create-kuadrant
+      restartPolicy: Never
+      containers:
+        - name: create-kuadrant
+          image: {{ .Values.global.toolsImage }}
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["/app/create-kuadrant.sh"]
+          args: []
+          volumeMounts:
+            - name: create-kuadrant-script
+              mountPath: /app
+      volumes:
+        - name: create-kuadrant-script
+          configMap:
+            name: create-kuadrant-script
+            defaultMode: 493
+{{- end }}

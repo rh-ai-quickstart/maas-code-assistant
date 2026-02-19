@@ -1,0 +1,40 @@
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: tier-free-users
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+{{- if .Values.tiers.free.users }}
+users:
+  {{- toYaml .Values.tiers.free.users | nindent 2 }}
+{{- else }}
+users: []
+{{- end }}
+---
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: tier-premium-users
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+{{- if .Values.tiers.premium.users }}
+users:
+  {{- toYaml .Values.tiers.premium.users | nindent 2 }}
+{{- else }}
+users: []
+{{- end }}
+
+---
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: tier-enterprise-users
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+{{- if .Values.tiers.enterprise.users }}
+users:
+  {{- toYaml .Values.tiers.enterprise.users | nindent 2 }}
+{{- else }}
+users: []
+{{- end }}
+

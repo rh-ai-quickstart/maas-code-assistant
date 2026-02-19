@@ -1,0 +1,83 @@
+{{- range .Values.models }}
+---
+apiVersion: serving.kserve.io/v1alpha1
+kind: LLMInferenceService
+metadata:
+  annotations:
+    alpha.maas.opendatahub.io/tiers: {{ toJson (.tiers | default $.Values.defaultModelTiers) | quote }}
+    openshift.io/display-name: {{ .displayName }}
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+    opendatahub.io/dashboard: "true"
+    opendatahub.io/genai-asset: "true"
+  name: {{ .name }}
+  namespace: {{ $.Values.modelsNamespace }}
+spec:
+  model:
+    name: {{ .name }}
+    uri: {{ .uri }}
+  replicas: 1
+  router:
+    gateway:
+      refs:
+        - name: maas-default-gateway
+          namespace: openshift-ingress
+    route: {}
+  template:
+    containers:
+      - name: main
+        image: {{ .image | default $.Values.defaultImage }}
+        command:
+          {{- if .command }}
+          {{- toYaml .command | nindent 10 }}
+          {{- else }}
+          - python
+          - -m
+          - vllm.entrypoints.openai.api_server
+          {{- end }}
+        args:
+          - "--served-model-name={{ `{{.Name}}` }}"
+          - --model=/mnt/models
+          - --enable-ssl-refresh
+          - --ssl-certfile=/var/run/kserve/tls/tls.crt
+          - --ssl-keyfile=/var/run/kserve/tls/tls.key
+          {{- with .extraArgs }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- with .env }}
+        env:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        ports:
+          - containerPort: 8000
+            name: http
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+            scheme: HTTPS
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+            scheme: HTTPS
+        resources:
+          {{- toYaml .resources | nindent 10 }}
+        volumeMounts:
+          - mountPath: /dev/shm
+            name: shm
+    {{- with .nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    volumes:
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 2Gi
+        name: shm
+{{- end }}

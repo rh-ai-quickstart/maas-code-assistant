@@ -1,0 +1,10 @@
+apiVersion: v2
+name: dependency-operators
+description: A chart to deploy the dependency operators and operands for the MaaS code-assistant
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+
+dependencies:
+  - name: install-operators
+    condition: install-operators.enabled

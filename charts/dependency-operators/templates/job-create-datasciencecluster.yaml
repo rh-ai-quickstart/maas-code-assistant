@@ -1,0 +1,68 @@
+{{- with .Values.dataScienceCluster }}
+{{- if .create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: create-datasciencecluster
+  namespace: redhat-ods-operator
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: create-datasciencecluster
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: datascienceclusters.datasciencecluster.opendatahub.io-v1-admin
+subjects:
+- kind: ServiceAccount
+  name: create-datasciencecluster
+  namespace: redhat-ods-operator
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: create-datasciencecluster
+  namespace: redhat-ods-operator
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+data:
+{{ tpl ($.Files.Glob "files/openshift-ai/*").AsConfig . | indent 2 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-datasciencecluster
+  namespace: redhat-ods-operator
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccountName: create-datasciencecluster
+      restartPolicy: Never
+      containers:
+      - name: create-datasciencecluster
+        image: {{ $.Values.global.toolsImage }}
+        imagePullPolicy: IfNotPresent
+        workingDir: /app
+        command: ["/app/create-datasciencecluster.sh"]
+        args: []
+        volumeMounts:
+          - name: create-datasciencecluster-script
+            mountPath: /app
+      volumes:
+        - name: create-datasciencecluster-script
+          configMap:
+            name: create-datasciencecluster
+            defaultMode: 493
+{{- end }}
+{{- end }}

@@ -1,0 +1,35 @@
+global:
+  wildcardDomain: apps.cluster.example.com
+  toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+
+name: keycloak
+namespace: keycloak
+replicas: 1
+
+realm:
+  create: true
+  name: sso
+  openshiftClientId: ocp-idp
+  openshiftClientSecret: abcdefghijkl
+  admin:
+    username: admin
+    password: openshift
+  user:
+    prefix: user
+    count: 5
+    password: openshift
+
+removeKubeAdmin: true
+
+postgresCluster:
+  create: true
+  name: keycloak-postgres
+  host: ""
+  credentialsSecret: ""
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi

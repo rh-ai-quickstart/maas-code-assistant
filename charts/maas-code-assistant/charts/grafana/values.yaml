@@ -1,0 +1,7 @@
+global:
+  toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+
+oauthProxyImage: image-registry.openshift-image-registry.svc:5000/openshift/oauth-proxy:v4.4
+namespace: grafana
+sessionSecret: ""
+nameOverride: maas-code-assistant

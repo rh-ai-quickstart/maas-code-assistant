@@ -1,0 +1,8 @@
+---
+apiVersion: v2
+name: devspaces
+description: >
+  A helm chart to use the OpenShift DevSpaces operator to deploy a CheCluster
+type: application
+version: 0.1.0
+appVersion: 0.1.0

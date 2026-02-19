@@ -1,0 +1,37 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: {{ .Values.name }}
+  {{- with .Values.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+spec:
+  db:
+    vendor: postgres
+    database: {{ .Values.postgresCluster.name }}
+    host: {{ .Values.postgresCluster.host | default (printf "%s-rw" .Values.postgresCluster.name) }}
+    usernameSecret:
+      name: {{ .Values.postgresCluster.credentialsSecret | default (printf "%s-app" .Values.postgresCluster.name) }}
+      key: username
+    passwordSecret:
+      name: {{ .Values.postgresCluster.credentialsSecret | default (printf "%s-app" .Values.postgresCluster.name) }}
+      key: password
+  hostname:
+    hostname: {{ .Values.name }}.{{ .Values.global.wildcardDomain }}
+    strict: false
+    strictBackchannel: false
+  http:
+    httpEnabled: False
+    tlsSecret: {{ .Values.name }}-internal-tls
+    annotations:
+      service.beta.openshift.io/serving-cert-secret-name: {{ .Values.name }}-internal-tls
+  ingress:
+    enabled: false
+  instances: {{ .Values.replicas }}
+  transaction:
+    xaEnabled: true
+  additionalOptions:
+    - name: enable-recovery
+      value: 'true'

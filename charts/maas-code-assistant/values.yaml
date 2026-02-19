@@ -1,0 +1,107 @@
+global:
+  wildcardDomain: apps.cluster.example.com
+  wildcardCertName: cert-manager-ingress-cert
+  toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+
+# Manage optional chart prerequisite setup
+openshift-ai:
+  enabled: true # This will primarily configure the dashboard to support MaaS in this configuration
+keycloak:
+  enabled: false
+  namespace: keycloak
+devspaces:
+  enabled: false
+  namespace: openshift-devspaces
+grafana:
+  enabled: false
+  namespace: grafana
+  selectors: {}
+cluster-monitoring:
+  enabled: false
+
+tiers:
+  free:
+    users: []
+  premium:
+    users:
+      - user1
+      - user2
+      - user3
+      - user4
+      - user5
+  enterprise:
+    users:
+      - admin
+
+workspace:
+  namespacePrefix: wksp
+
+  devworkspace:
+    name: exercises
+    projects:
+      repoUrl: https://github.com/rh-aiservices-bu/nvidia-redhat-blueprint-maas.git
+      revision: main
+    image: registry.redhat.io/devspaces/udi-rhel9:3.25.0
+
+defaultServingImage: registry.redhat.io/rhaiis/vllm-cuda-rhel9:3.2.5
+
+defaultModelTiers:
+  - free
+  - premium
+  - enterprise
+
+modelsNamespace: maas
+models:
+  - name: gpt-oss-20b
+    displayName: OpenAI gpt-oss-20b
+    uri: oci://registry.redhat.io/rhelai1/modelcar-gpt-oss-20b:1.5
+    resources:
+      limits:
+        cpu: "6"
+        memory: 48Gi
+        nvidia.com/gpu: "1"
+      requests:
+        cpu: "4"
+        memory: 32Gi
+        nvidia.com/gpu: "1"
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
+  - name: nemotron-3-nano-30b-a3b
+    displayName: NVIDIA Nemotron 3 Nano 30B A3B FP8
+    tiers:
+      - premium
+      - enterprise
+    uri: oci://quay.io/jharmison/models:redhatai--nvidia-nemotron-3-nano-30b-a3b-fp8-modelcar
+    image: docker.io/vllm/vllm-openai:latest
+    command:
+      - vllm
+      - serve
+    resources:
+      limits:
+        cpu: "6"
+        memory: 48Gi
+        nvidia.com/gpu: "1"
+      requests:
+        cpu: "4"
+        memory: 32Gi
+        nvidia.com/gpu: "1"
+    extraArgs:
+      - --enable-auto-tool-choice
+      - --tool-call-parser=qwen3_coder
+      - --gpu-memory-utilization=0.95
+      - --max-model-len=131072
+      - --trust-remote-code
+      - --reasoning-parser-plugin=/mnt/models/nano_v3_reasoning_parser.py
+      - --reasoning-parser=nano_v3
+      - --kv-cache-dtype=fp8
+    env:
+      - name: VLLM_USE_FLASHINFER_MOE_FP8
+        value: "1"
+      - name: FLASHINFER_WORKSPACE_BASE
+        value: /tmp/flashinfer-cache
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists

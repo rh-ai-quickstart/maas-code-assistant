@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: patch-odhdashboardconfig
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: patch-odhdashboardconfig
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["opendatahub.io"]
+  resources: ["odhdashboardconfigs"]
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: patch-odhdashboardconfig
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: patch-odhdashboardconfig
+subjects:
+  - kind: ServiceAccount
+    name: patch-odhdashboardconfig
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: patch-odhdashboardconfig-script
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+data:
+{{ tpl (.Files.Glob "files/*").AsConfig $ | indent 2 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: patch-odhdashboardconfig
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccount: patch-odhdashboardconfig
+      serviceAccountName: patch-odhdashboardconfig
+      restartPolicy: Never
+      containers:
+      - name: patch-odhdashboardconfig
+        image: {{ .Values.global.toolsImage }}
+        imagePullPolicy: IfNotPresent
+        workingDir: /app
+        command: ["/app/patch-odhdashboardconfig.sh"]
+        args: []
+        volumeMounts:
+          - name: patch-odhdashboardconfig-script
+            mountPath: /app
+      volumes:
+        - name: patch-odhdashboardconfig-script
+          configMap:
+            name: patch-odhdashboardconfig-script
+            defaultMode: 493

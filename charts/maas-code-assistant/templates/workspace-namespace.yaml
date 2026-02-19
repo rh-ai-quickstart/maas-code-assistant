@@ -1,0 +1,15 @@
+{{- range $user := ((include "maas-code-assistant.users" .) | fromJsonArray)  }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $.Values.workspace.namespacePrefix }}-{{ $user }}
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+    app.kubernetes.io/part-of: che.eclipse.org
+    app.kubernetes.io/component: workspaces-namespace
+  annotations:
+    openshift.io/display-name: "Workspace {{ $user }}"
+    openshift.io/description: "Workspace Namespace"
+    che.eclipse.org/username: {{ $user }}
+{{- end }}

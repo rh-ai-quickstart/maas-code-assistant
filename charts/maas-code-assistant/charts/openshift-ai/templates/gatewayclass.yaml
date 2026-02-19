@@ -1,0 +1,12 @@
+{{- if .Values.gatewayClass.create }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: openshift-default
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  controllerName: "openshift.io/gateway-controller/v1"
+{{- end }}

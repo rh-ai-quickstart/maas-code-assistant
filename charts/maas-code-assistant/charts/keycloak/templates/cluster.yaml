@@ -1,0 +1,25 @@
+{{- with $cluster := .Values.postgresCluster }}
+{{- if $cluster.create }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ $cluster.name }}
+  {{- with $.Values.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+spec:
+  instances: {{ $cluster.instances | default 1 }}
+  storage:
+    {{- toYaml ($cluster.storage | default ("{\"size\": \"2Gi\"}" | fromJson)) | nindent 4 }}
+  bootstrap:
+    initdb:
+      database: {{ $cluster.name }}
+      owner: {{ $cluster.name }}
+  {{- with $cluster.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
