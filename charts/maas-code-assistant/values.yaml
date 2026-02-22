@@ -57,12 +57,12 @@ models:
     uri: oci://registry.redhat.io/rhelai1/modelcar-gpt-oss-20b:1.5
     resources:
       limits:
-        cpu: "6"
-        memory: 48Gi
+        cpu: "4"
+        memory: 24Gi
         nvidia.com/gpu: "1"
       requests:
-        cpu: "4"
-        memory: 32Gi
+        cpu: "2"
+        memory: 16Gi
         nvidia.com/gpu: "1"
     tolerations:
       - effect: NoSchedule
@@ -74,33 +74,22 @@ models:
       - premium
       - enterprise
     uri: oci://quay.io/jharmison/models:redhatai--nvidia-nemotron-3-nano-30b-a3b-fp8-modelcar
-    image: docker.io/vllm/vllm-openai:latest
-    command:
-      - vllm
-      - serve
     resources:
       limits:
-        cpu: "6"
-        memory: 48Gi
+        cpu: "4"
+        memory: 24Gi
         nvidia.com/gpu: "1"
       requests:
-        cpu: "4"
-        memory: 32Gi
+        cpu: "2"
+        memory: 16Gi
         nvidia.com/gpu: "1"
     extraArgs:
+      - --max-model-len=131072
       - --enable-auto-tool-choice
       - --tool-call-parser=qwen3_coder
-      - --gpu-memory-utilization=0.95
-      - --max-model-len=131072
       - --trust-remote-code
       - --reasoning-parser-plugin=/mnt/models/nano_v3_reasoning_parser.py
       - --reasoning-parser=nano_v3
-      - --kv-cache-dtype=fp8
-    env:
-      - name: VLLM_USE_FLASHINFER_MOE_FP8
-        value: "1"
-      - name: FLASHINFER_WORKSPACE_BASE
-        value: /tmp/flashinfer-cache
     tolerations:
       - effect: NoSchedule
         key: nvidia.com/gpu
