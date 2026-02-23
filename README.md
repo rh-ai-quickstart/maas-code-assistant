@@ -1,7 +1,6 @@
-# Accelerate enterprise development with NVIDIA and MaaS
+# Accelerate enterprise software development with NVIDIA and MaaS
 
-Optimize app development using the latest NVIDIA Nemotron models through Models-as-a-Service on your own private
-multi-tenant infrastructure in Red Hat AI.
+Optimize private app development using NVIDIA Nemotron models through Models-as-a-Service on your own multi-tenant infrastructure in Red Hat AI.
 
 ## Table of contents
 
@@ -106,19 +105,29 @@ deploying the QuickStart with more control._
 
 ### Installation Steps
 
-1. Ensure you’re logged into your cluster as a cluster-admin user, such as `kube:admin` or `system:admin`:
+1. Git clone QuickStart repository
+
+``` 
+git clone 
+```
+
+2. cd into the directory
+
+```
+cd maas-code-assistant
+```
+
+3. Ensure you’re logged into your cluster as a cluster-admin user, such as `kube:admin` or `system:admin`:
 
 ```
 oc whoami
 ```
 
-2. Run all-in-one.sh. Enter passwords for the admin and user accounts when prompted.
+4. Run all-in-one.sh. Enter passwords for the admin and user accounts when prompted.
 
 ```
 ./all-in-one.sh
 ```
-
-<!-- proof of install screenshot / verify install was successful instructions -->
 
 ### Delete
 
@@ -290,8 +299,6 @@ If this is the case, update your `environment.yaml` to include `openshift-ai.gat
 
 ## Tags
 
-- **Title**: Accelerate enterprise development with NVIDIA and MaaS
-- **Description**: Optimize app development using the latest NVIDIA Nemotron models through Models-as-a-Service on your
-  own private multi-tenant infrastructure in Red Hat AI.
 - **Product**: Red Hat AI Enterprise
 - **Use case**: Code development
+- **Industry**: Adopt and scale AI
