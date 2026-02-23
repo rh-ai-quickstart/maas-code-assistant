@@ -4,6 +4,8 @@ kind: Gateway
 metadata:
   name: openshift-ai-inference
   namespace: openshift-ingress
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   gatewayClassName: openshift-default
   listeners:

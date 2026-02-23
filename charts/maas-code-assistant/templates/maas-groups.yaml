@@ -4,6 +4,8 @@ metadata:
   name: tier-free-users
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
 {{- if .Values.tiers.free.users }}
 users:
   {{- toYaml .Values.tiers.free.users | nindent 2 }}
@@ -17,6 +19,8 @@ metadata:
   name: tier-premium-users
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
 {{- if .Values.tiers.premium.users }}
 users:
   {{- toYaml .Values.tiers.premium.users | nindent 2 }}
@@ -31,6 +35,8 @@ metadata:
   name: tier-enterprise-users
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
 {{- if .Values.tiers.enterprise.users }}
 users:
   {{- toYaml .Values.tiers.enterprise.users | nindent 2 }}
