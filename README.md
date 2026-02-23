@@ -180,7 +180,8 @@ The following prerequisites are required in your environment to prevent any conf
   - A basic CheCluster resource is configured, as in steps 2 and 3 of the above.
 - Red Hat OpenShift AI version 3.2.0 has been deployed from the fast-3.x channel,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
-  - A Data Science Cluster has been created that enables at least the Dashboard and KServe components,
+  - A Data Science Cluster has been created that enables at least the Dashboard, KServe, and Llama Stack Operator
+    components,
     [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-and-managing-openshift-ai-components_component-install).
   - Note that using **Manual** approval mode with the **startingCSV** set to `rhods-operator.3.2.0` is recommended to
     stay on the version tested with this code base.
