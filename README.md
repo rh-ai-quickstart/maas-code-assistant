@@ -231,13 +231,18 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
    2. `grafana.namespace` and `grafana.selectors`
       1. Use the Namespace of your `Grafana` resource for the Grafana Operator.
       2. Set `selectors` to match labels on your `Grafana` instance. For example, if you get the following output:
+
       ```
       oc get grafana grafana -n grafana -ojsonpath='{.metadata.labels}' | jq .
       ```
+
       `{`\
       `  “app”: “grafana”`\
       `}`\
       You should set `selectors` to `app: grafana`.
+
+   3. If you have deployed the `openshift-default` GatewayClass, as instructed above, configure it to not be managed by
+      the chart by setting `openshift-ai.gatewayClass.create` to `false`.
 
 5. Update the `tiers` section to map your desired user/tier mapping for the default MaaS tiers.
    1. For example, if you have users named “bob,” “sue,” and “tom,” and would like them all to be in the enterprise
