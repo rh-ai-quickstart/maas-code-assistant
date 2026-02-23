@@ -258,7 +258,12 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
          - tom
    ```
 
-6. Install the QuickStart with helm:
+6. Complete any tweaks necessary to the `models` array to ensure the workloads will place on your GPU-enabled nodes.
+   This may involve changing the tolerations, adjusting the resources, adding the `nodeSelector` field to each model and
+   configuring it with a valid `nodeSelector` for the
+   [pod template](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors), etc.
+
+7. Install the QuickStart with helm:
 
 ```
 helm install maas-code-assistant ./charts/maas-code-assistant -f environment.yaml
