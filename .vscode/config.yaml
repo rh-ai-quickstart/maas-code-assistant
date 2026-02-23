@@ -1,0 +1,17 @@
+name: Local Assistant
+version: 1.0.0
+schema: v1
+models:
+  - name: NVIDIA Nemotron 3 Nano 30B-A3B
+    provider: openai
+    model: "nemotron-3-nano-30b-a3b"
+    apiBase: "YOUR_MAAS_ROUTE/v1"
+    apiKey: "YOUR_API_KEY"
+context:
+  - provider: code
+  - provider: docs
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
