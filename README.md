@@ -35,7 +35,7 @@ models via API tokens, administrators can also implement specific rate limits an
 simplify access and usage, it allows organizations to monitor metrics, forecast capacity and compute needs, and manage
 chargebacks with precision.
 
-This QuickStart demonstrates how you can easily deploy a private AI code assistant powered by NVIDIA Nemotron models and
+This quickstart demonstrates how you can easily deploy a private AI code assistant powered by NVIDIA Nemotron models and
 delivered through Red Hat AI's integrated Models as a Service (MaaS) offering. Developers access the assistant through
 OpenShift DevSpaces, a containerized cloud-native IDE included in OpenShift.
 
@@ -65,7 +65,7 @@ to the code assistant application with OpenShift DevSpaces. For more details cli
 - One NVIDIA GPU node with 48GB VRAM for Nemotron model
 - One NVIDIA GPU node with 48GB VRAM for gpt-oss model
 
-**Note**: Models in this QuickStart were tested with 2 L40S GPU instances on AWS (instance type g6e.2xlarge).
+**Note**: Models in this quickstart were tested with 2 L40S GPU instances on AWS (instance type g6e.2xlarge).
 
 ### Minimum software requirements
 
@@ -84,12 +84,12 @@ to the code assistant application with OpenShift DevSpaces. For more details cli
 
 ## Deploy
 
-The following instructions will easily deploy the QuickStart to your Red Hat AI environment using an auto-pilot
+The following instructions will easily deploy the quickstart to your Red Hat AI environment using an auto-pilot
 script-based installation. This will configure the necessary prerequisites for your environment and wire everything
 together, removing the need for additional configuration.
 
 _Please see the [advanced deployment](#advanced-deployment) section for details on setting up your own prerequisites and
-deploying the QuickStart with more control._
+deploying the quickstart with more control._
 
 ### Prerequisites
 
@@ -105,7 +105,7 @@ deploying the QuickStart with more control._
 
 ### Installation Steps
 
-1. Git clone QuickStart repository
+1. git clone quickstart repository
 
 ``` 
 git clone https://github.com/rh-ai-quickstart/maas-code-assistant.git
@@ -168,13 +168,13 @@ to your specific environment.
 Use this deployment path if you:
 
 - Have a configured cluster with some or all of the prerequisites already deployed.
-- Prefer a different configuration path than the defaults set in the QuickStart repository installation script.
+- Prefer a different configuration path than the defaults set in the quickstart repository installation script.
 - Are using the cluster for other workloads and therefore need to customize the installation to avoid conflict with
   existing cluster resources.
 
 ### Prerequisites
 
-The following prerequisites are required in your environment to prevent any conflicts with the QuickStart:
+The following prerequisites are required in your environment to prevent any conflicts with the quickstart:
 
 - Users have been configured with OpenShift OAuth, backed by OIDC or some other auth method such as htpasswd,
   [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/postinstallation_configuration/post-install-preparing-for-users).
@@ -286,7 +286,7 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
    configuring it with a valid `nodeSelector` for the
    [pod template](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors), etc.
 
-7. Install the QuickStart with helm:
+7. Install the quickstart with helm:
 
 ```
 helm install maas-code-assistant ./charts/maas-code-assistant -f environment.yaml
