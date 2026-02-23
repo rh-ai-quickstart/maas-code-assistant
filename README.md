@@ -167,12 +167,19 @@ The following prerequisites are required in your environment to prevent any conf
   - An example Grafana operand, with all RBAC and resources wired up to User Workload Monitoring, is available in
     [docs/examples/grafana.yaml](docs/examples/grafana.yaml). It expects that your Grafana Operator installation was
     namespace scoped, and deployed to the `grafana` namespace, and that your in-cluster registry is configured.
-- OpenShift Dev Spaces is deployed
-  - A basic CheCluster resource is configured
-- Red Hat OpenShift AI version 3.2.0 has been deployed from the fast-3.x channel
-  - A Data Science Cluster has been created that enables at least the Dashboard and KServe components.
-- Red Hat Connectivity Link has been deployed from the stable channel
-  - A Kuadrant resource has been installed in the `kuadrant-system` namespace, as documented.
+- Red Hat OpenShift Dev Spaces is deployed,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.26/html-single/administration_guide/index#installing-devspaces-on-openshift-using-the-web-console).
+  - A basic CheCluster resource is configured, as in steps 2 and 3 of the above.
+- Red Hat OpenShift AI version 3.2.0 has been deployed from the fast-3.x channel,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
+  - A Data Science Cluster has been created that enables at least the Dashboard and KServe components,
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-and-managing-openshift-ai-components_component-install).
+  - Note that using **Manual** approval mode with the **startingCSV** set to `rhods-operator.3.2.0` is recommended to
+    stay on the version tested with this code base.
+- Red Hat Connectivity Link has been deployed from the stable channel,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/rhcl-install-ocp-web-console_connectivity-link).
+  - A `Kuadrant` resource has been installed in the `kuadrant-system` namespace,
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/install-on-ocp-cmd_connectivity-link#:~:text=To%20create%20your%20Connectivity%20Link%20deployment%2C%20enter%20the%20following%20command%3A).
 
 ### Installation Steps
 
