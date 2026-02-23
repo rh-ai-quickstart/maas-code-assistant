@@ -191,13 +191,19 @@ oc get nodes
 ```
 
 2. Install the developer preview release of Models as a Service.
-   1. Run, from the root of the cloned repository, the following and ensure the values look correct for your cluster:
+   1. Create a namespace for the developer preview:
+
+      ```
+      oc create ns maas-api
+      ```
+
+   2. Run, from the root of the cloned repository, the following and ensure the values look correct for your cluster:
 
       ```
       ./dev-preview/render.sh
       ```
 
-   2. Apply the rendered developer preview overlay with the following:
+   3. Apply the rendered developer preview overlay with the following:
 
       ```
       oc apply -k dev-preview
