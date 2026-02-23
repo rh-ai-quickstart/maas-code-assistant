@@ -39,6 +39,21 @@ subjects:
   - kind: ServiceAccount
     name: patch-odhdashboardconfig
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: patch-odhdashboardconfig-edit
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: patch-odhdashboardconfig
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
