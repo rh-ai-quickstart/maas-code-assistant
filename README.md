@@ -274,6 +274,11 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
 helm install maas-code-assistant ./charts/maas-code-assistant -f environment.yaml
 ```
 
+Note that, depending on your environment, the `openshift-ai-inference` Gateway may already be deployed in your cluster,
+giving you error output such as
+`Error: INSTALLATION FAILED: Unable to continue with install: Gateway "openshift-ai-inference" in namespace "openshift-ingress" exists and cannot be imported into the current release`.
+If this is the case, update your `environment.yaml` to include `openshift-ai.gateway.create` set to `false`.
+
 ## Tags
 
 - **Title**: Accelerate enterprise development with NVIDIA and MaaS
