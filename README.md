@@ -180,6 +180,10 @@ The following prerequisites are required in your environment to prevent any conf
   [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/rhcl-install-ocp-web-console_connectivity-link).
   - A `Kuadrant` resource has been installed in the `kuadrant-system` namespace,
     [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/install-on-ocp-cmd_connectivity-link#:~:text=To%20create%20your%20Connectivity%20Link%20deployment%2C%20enter%20the%20following%20command%3A).
+- You have created the `openshift-default` **GatewayClass** object for Gateway API in OpenShift, and are able to create
+  Gateway instances using your clusters load balancer and infrastructure configuration. See
+  [the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#ingress-gateway-api)
+  for more details about Gateway API in OpenShift.
 
 ### Installation Steps
 
