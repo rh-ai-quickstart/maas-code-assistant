@@ -35,7 +35,9 @@ if ! [ -e charts/maas-code-assistant/all-dependencies.yaml ]; then
 fi
 
 # Install all dependency operators, and create the DataScienceCluster for RHOAI
-noisy helm upgrade --install dependency-operators charts/dependency-operators --timeout 15m0s
+noisy helm upgrade --install --timeout 15m0s \
+  dependency-operators charts/dependency-operators \
+  -f charts/maas-code-assistant/all-dependencies.yaml
 noisy oc wait --for=condition=Ready datasciencecluster default-dsc --timeout 15m0s
 
 # Install the chart
