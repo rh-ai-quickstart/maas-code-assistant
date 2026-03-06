@@ -8,6 +8,10 @@ spec:
       type: OpenID
       mappingMethod: claim
       openID:
+        {{- if .Values.ingressCA }}
+        ca:
+          name: router-ca
+        {{- end }}
         claims:
           email:
             - email

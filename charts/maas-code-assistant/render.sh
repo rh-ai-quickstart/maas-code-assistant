@@ -12,8 +12,11 @@ export INGRESS_DOMAIN
 INGRESS_CERTIFICATE=$(oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.spec.defaultCertificate.name}' 2>/dev/null)
 if [ -z "$INGRESS_CERTIFICATE" ]; then
   INGRESS_CERTIFICATE=router-certs-default
+  INGRESS_CA="$(oc get secret -n openshift-ingress-operator router-ca -ogo-template='{{ index .data "tls.crt" | base64decode }}')"
+else
+  INGRESS_CA=""
 fi
-export INGRESS_CERTIFICATE
+export INGRESS_CERTIFICATE INGRESS_CA
 
 cd "$(dirname "$(realpath "$0")")"
 

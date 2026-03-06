@@ -1,0 +1,10 @@
+{{- with .Values.ingressCA }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: router-ca
+  namespace: openshift-config
+data:
+  ca.crt: |-
+    {{- . | nindent 4 }}
+{{- end }}
