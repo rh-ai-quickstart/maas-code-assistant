@@ -4,9 +4,6 @@ global:
 gatewayClass:
   create: true
 
-gateway:
-  create: true
-
 dashboardConfig:
   genAiStudio: true
   modelAsService: true

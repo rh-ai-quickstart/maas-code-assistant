@@ -18,10 +18,6 @@ function noisy {
   "${@}"
 }
 
-# Render values from the cluster (router wildcard domain and default certificate name)
-if ! [ -e dev-preview/kustomization.yaml ]; then
-  ./dev-preview/render.sh
-fi
 if ! [ -e charts/maas-code-assistant/all-dependencies.yaml ]; then
   ./charts/maas-code-assistant/render.sh
 fi
@@ -29,13 +25,6 @@ fi
 # Install all dependency operators, and create the DataScienceCluster for RHOAI
 noisy helm upgrade --install dependency-operators charts/dependency-operators --timeout 15m0s
 noisy oc wait --for=condition=Ready datasciencecluster default-dsc
-
-# Install the maas-api project for the dev preview
-if ! oc get ns maas-api >/dev/null 2>&1; then
-  noisy oc create ns maas-api
-fi
-noisy oc apply -k dev-preview
-noisy oc rollout status deployment maas-api -n maas-api
 
 if [ -r .env ]; then
   . .env
