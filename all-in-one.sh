@@ -24,7 +24,7 @@ fi
 
 # Install all dependency operators, and create the DataScienceCluster for RHOAI
 noisy helm upgrade --install dependency-operators charts/dependency-operators --timeout 15m0s
-noisy oc wait --for=condition=Ready datasciencecluster default-dsc
+noisy oc wait --for=condition=Ready datasciencecluster default-dsc --timeout 15m0s
 
 if [ -r .env ]; then
   . .env
