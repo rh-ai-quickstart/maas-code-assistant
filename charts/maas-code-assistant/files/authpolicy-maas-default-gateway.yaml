@@ -2,14 +2,13 @@ apiVersion: kuadrant.io/v1
 kind: AuthPolicy
 metadata:
   name: maas-default-gateway-authn
-  namespace: openshift-ingress
 spec:
   rules:
     authentication:
       service-accounts:
         cache:
           key:
-            selector: 'context.request.http.headers.authorization.@case:lower'
+            selector: "context.request.http.headers.authorization.@case:lower"
           ttl: 600
         defaults:
           userid:
