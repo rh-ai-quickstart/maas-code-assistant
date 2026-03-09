@@ -7,11 +7,13 @@ if [ -r .env ]; then
   . .env
 fi
 if [ -z "$ADMIN_PASSWORD" ]; then
-  read -rsp 'Enter a password for the admin user: ' ADMIN_PASSWORD
+  read -rsp 'Enter a password to set for the admin user (will be created): ' ADMIN_PASSWORD
+  echo "ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"" >> .env
 fi
 echo
 if [ -z "$USER_PASSWORD" ]; then
-  read -rsp 'Enter a password for the generated users: ' USER_PASSWORD
+  read -rsp 'Enter a password to set for the generated users (user1-user5 by default): ' USER_PASSWORD
+  echo "USER_PASSWORD=\"$USER_PASSWORD\"" >> .env
 fi
 echo
 
