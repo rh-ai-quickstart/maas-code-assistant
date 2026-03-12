@@ -3,7 +3,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ $model.name }}-model-post-access
+  name: {{ $model.name }}-model-get
   namespace: {{ $.Values.modelsNamespace }}
 subjects:
   {{- range $tier := ($model.tiers | default $.Values.defaultModelTiers) }}
@@ -14,5 +14,5 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ $model.name }}-model-post-access
+  name: {{ $model.name }}-view-role
 {{- end }}
