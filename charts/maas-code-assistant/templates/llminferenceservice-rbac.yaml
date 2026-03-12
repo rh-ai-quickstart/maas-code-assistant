@@ -1,6 +1,23 @@
 {{- range $model := .Values.models }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: {{ $model.name }}-view-role
+  namespace: {{ $.Values.modelsNamespace }}
+rules:
+- apiGroups:
+  - serving.kserve.io
+  resourceNames:
+  - {{ $model.name }}
+  resources:
+  - llminferenceservices
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ $model.name }}-model-get
