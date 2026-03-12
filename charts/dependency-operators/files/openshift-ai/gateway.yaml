@@ -1,3 +1,38 @@
+{{- with .Values.gateways.maasDefaultGateway }}
+{{- if .create }}
+{{- if .useRoute }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maas-default-gateway-config
+  namespace: openshift-ingress
+data:
+  service: |
+    metadata:
+      annotations:
+        service.beta.openshift.io/serving-cert-secret-name: maas-default-gateway-service-tls
+    spec:
+      type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: maas-default-gateway
+  namespace: openshift-ingress
+spec:
+  host: maas.{{ $.Values.global.wildcardDomain }}
+  port: targetPort: 443
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: reencrypt
+  to:
+    kind: Service
+    name: maas-default-gateway-openshift-default
+    weight: 100
+  wildcardPolicy: None
+{{- end }}
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -9,20 +44,101 @@ spec:
     - name: http
       port: 80
       protocol: HTTP
-      hostname: maas.{{ .Values.global.wildcardDomain }}
+      {{- if not .useRoute }}
+      hostname: maas.{{ $.Values.global.wildcardDomain }}
+      {{- end }}
       allowedRoutes:
         namespaces:
           from: All
     - name: https
       port: 443
       protocol: HTTPS
-      hostname: maas.{{ .Values.global.wildcardDomain }}
+      {{- if not .useRoute }}
+      hostname: maas.{{ $.Values.global.wildcardDomain }}
+      {{- end }}
       tls:
         certificateRefs:
         - group: ""
           kind: Secret
-          name: {{ .Values.global.wildcardCertName }}
+          {{- if .useRoute }}
+          name: maas-default-gateway-service-tls
+          {{- else }}
+          name: {{ $.Values.global.wildcardCertName }}
+          {{- end }}
         mode: Terminate
       allowedRoutes:
         namespaces:
           from: All
+{{- end }}
+{{- with .Values.gateways.openshiftAiInference }}
+{{- if .create }}
+{{- if .useRoute }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openshift-ai-inference-config
+  namespace: openshift-ingress
+data:
+  service: |
+    metadata:
+      annotations:
+        service.beta.openshift.io/serving-cert-secret-name: openshift-ai-inference-service-tls
+    spec:
+      type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openshift-ai-inference
+  namespace: openshift-ingress
+spec:
+  host: inference.{{ $.Values.global.wildcardDomain }}
+  port: targetPort: 443
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: reencrypt
+  to:
+    kind: Service
+    name: openshift-ai-inference-openshift-default
+    weight: 100
+  wildcardPolicy: None
+{{- end }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: openshift-ai-inference
+  namespace: openshift-ingress
+spec:
+  gatewayClassName: openshift-default
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      {{- if not .useRoute }}
+      hostname: inference.{{ $.Values.global.wildcardDomain }}
+      {{- end }}
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      port: 443
+      protocol: HTTPS
+      {{- if not .useRoute }}
+      hostname: inference.{{ $.Values.global.wildcardDomain }}
+      {{- end }}
+      tls:
+        certificateRefs:
+        - group: ""
+          kind: Secret
+          {{- if .useRoute }}
+          name: openshift-ai-inference-service-tls
+          {{- else }}
+          name: {{ $.Values.global.wildcardCertName }}
+          {{- end }}
+        mode: Terminate
+      allowedRoutes:
+        namespaces:
+          from: All
+{{- end }}
