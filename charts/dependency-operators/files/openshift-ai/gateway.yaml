@@ -22,7 +22,8 @@ metadata:
   namespace: openshift-ingress
 spec:
   host: maas.{{ $.Values.global.wildcardDomain }}
-  port: targetPort: 443
+  port:
+    targetPort: 443
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: reencrypt
@@ -102,7 +103,8 @@ metadata:
   namespace: openshift-ingress
 spec:
   host: inference.{{ $.Values.global.wildcardDomain }}
-  port: targetPort: 443
+  port:
+    targetPort: 443
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: reencrypt
