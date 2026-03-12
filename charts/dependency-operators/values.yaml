@@ -5,10 +5,10 @@ global:
 gateways:
   maasDefaultGateway:
     create: true
-    useRoute: true
+    useRoute: false
   openshiftAiInference:
     create: true
-    useRoute: true
+    useRoute: false
 
 dataScienceCluster:
   create: true
