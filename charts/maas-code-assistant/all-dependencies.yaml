@@ -1,0 +1,8 @@
+keycloak:
+  enabled: true
+devspaces:
+  enabled: true
+grafana:
+  enabled: true
+cluster-monitoring:
+  enabled: true

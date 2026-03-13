@@ -37,19 +37,66 @@ function noisy {
   "${@}"
 }
 
-if ! [ -e charts/maas-code-assistant/all-dependencies.yaml ]; then
-  ./charts/maas-code-assistant/render.sh
+INGRESS_DOMAIN=$(oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.status.domain}' 2>/dev/null)
+if [ -z "$INGRESS_DOMAIN" ]; then
+  echo "Unable to retrieve ingress configuration from your cluster." >&2
+  echo "Are you logged in with oc?" >&2
+  oc whoami
+  exit 1
 fi
+export INGRESS_DOMAIN
+
+INGRESS_CERTIFICATE=$(oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.spec.defaultCertificate.name}' 2>/dev/null)
+if [ -z "$INGRESS_CERTIFICATE" ]; then
+  INGRESS_CERTIFICATE=router-certs-default
+  INGRESS_CA="$(oc get secret -n openshift-ingress-operator router-ca -ogo-template='{{ index .data "tls.crt" | base64decode }}')"
+else
+  INGRESS_CA=""
+fi
+export INGRESS_CERTIFICATE INGRESS_CA
+
+if [ "$(oc get config.imageregistry cluster -ogo-template='{{ range .status.conditions }}{{ if eq .type "Available" }}{{ .status }}{{ end }}{{ end }}')" = "True" ]; then
+  TOOLS_IMAGE=image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+else
+  TOOLS_IMAGE=quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e850f92068d8365e68bab663ae7b76be22c0af33f6a7803c5c95f5ee3f3748f4
+fi
+export TOOLS_IMAGE
+
+function gateway_use_route {
+    ret=1
+    if ! oc get svc -n openshift-ingress router-default >/dev/null 2>&1; then
+        ret=0
+    fi
+    if [ "$(oc get svc -n openshift-ingress router-default -ojsonpath='{.spec.type}')" != "LoadBalancer" ]; then
+        ret=0
+    fi
+    if [ "$ret" -ne 1 ]; then
+        echo "WARNING: Detected a non-load-balancer ingress configuration. Using a Route to back Gateway API resources." >&2
+    fi
+    return $ret
+}
+if gateway_use_route; then
+    GATEWAY_USE_ROUTE=true
+else
+    GATEWAY_USE_ROUTE=false
+fi
+export GATEWAY_USE_ROUTE
+
+eval "cat << EOF > environment.yaml
+$(<environment.yaml.tpl)
+EOF
+"
 
 # Install all dependency operators, and create the DataScienceCluster for RHOAI
 noisy helm upgrade --install --timeout 15m0s \
   dependency-operators charts/dependency-operators \
-  -f charts/maas-code-assistant/all-dependencies.yaml
+  -f environment.yaml
 noisy oc wait --for=condition=Ready datasciencecluster default-dsc --timeout 15m0s
 
 # Install the chart
 noisy -c "$ADMIN_PASSWORD" -c "$USER_PASSWORD" helm upgrade --install -n default --timeout 20m0s \
   maas-code-assistant charts/maas-code-assistant \
   -f charts/maas-code-assistant/all-dependencies.yaml \
+  -f environment.yaml \
   --set keycloak.realm.admin.password="$ADMIN_PASSWORD" \
   --set keycloak.realm.user.password="$USER_PASSWORD"
