@@ -6,6 +6,8 @@ metadata:
   annotations:
     alpha.maas.opendatahub.io/tiers: {{ toJson (.tiers | default $.Values.defaultModelTiers) | quote }}
     openshift.io/display-name: {{ .displayName }}
+    opendatahub.io/model-type: generative
+    security.opendatahub.io/enable-auth: "true"
   labels:
     {{- include "maas-code-assistant.labels" $ | nindent 4 }}
     opendatahub.io/dashboard: "true"
@@ -26,7 +28,7 @@ spec:
   template:
     containers:
       - name: main
-        image: {{ .image | default $.Values.defaultImage }}
+        image: {{ .image | default $.Values.defaultServingImage }}
         command:
           {{- if .command }}
           {{- toYaml .command | nindent 10 }}

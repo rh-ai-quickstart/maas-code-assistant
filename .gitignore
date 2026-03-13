@@ -3,3 +3,4 @@ CLAUDE.md
 Chart.lock
 deployments/*/charts
 .env
+environment.yaml

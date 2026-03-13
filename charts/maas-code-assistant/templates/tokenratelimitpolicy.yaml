@@ -1,0 +1,36 @@
+apiVersion: kuadrant.io/v1alpha1
+kind: TokenRateLimitPolicy
+metadata:
+  name: gateway-token-rate-limits
+  namespace: openshift-ingress
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: maas-default-gateway
+  limits:
+    free-user-tokens:
+      rates:
+        {{- toYaml .Values.tiers.free.tokenRates | nindent 8 }}
+      when:
+        - predicate: |
+            auth.identity.tier == "free"
+      counters:
+        - expression: auth.identity.userid
+
+    premium-user-tokens:
+      rates:
+        {{- toYaml .Values.tiers.premium.tokenRates | nindent 8 }}
+      when:
+        - predicate: |
+            auth.identity.tier == "premium"
+      counters:
+        - expression: auth.identity.userid
+    enterprise-user-tokens:
+      rates:
+        {{- toYaml .Values.tiers.enterprise.tokenRates | nindent 8 }}
+      when:
+        - predicate: |
+            auth.identity.tier == "enterprise"
+      counters:
+        - expression: auth.identity.userid

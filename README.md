@@ -1,6 +1,7 @@
 # Accelerate enterprise software development with NVIDIA and MaaS
 
-Optimize private app development using NVIDIA Nemotron models through Models-as-a-Service on your own multi-tenant infrastructure in Red Hat AI.
+Optimize private app development using NVIDIA Nemotron models through Models-as-a-Service on your own multi-tenant
+infrastructure in Red Hat AI.
 
 ## Table of contents
 
@@ -62,15 +63,14 @@ to the code assistant application with OpenShift DevSpaces. For more details cli
 
 ### Minimum hardware requirements
 
-- One NVIDIA GPU node with 48GB VRAM for Nemotron model
-- One NVIDIA GPU node with 48GB VRAM for gpt-oss model
+- One NVIDIA GPU node with at least 48GB VRAM for Nemotron model
+- One NVIDIA GPU node with at least 48GB VRAM for gpt-oss model
 
 **Note**: Models in this quickstart were tested with 2 L40S GPU instances on AWS (instance type g6e.2xlarge).
 
 ### Minimum software requirements
 
 - Red Hat OpenShift 4.20
-- Red Hat OpenShift AI 3.2
 - Helm CLI
 - OpenShift Client CLI
 - Bash shell available in PATH
@@ -94,9 +94,19 @@ deploying the quickstart with more control._
 ### Prerequisites
 
 - OpenShift cluster (specific version is specified in the software requirements section)
-  - Optional: certificates managed for the OpenShift Router
+  - Optional (recommended): trusted certificates managed for the OpenShift Router,
+    [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/configuring-certificates#replacing-default-ingress_replacing-default-ingress)
+- A default
+  [StorageClass](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage)
+  needs to be configured. If your cluster is on a cloud provider, this is probably available out of the box. If you're
+  on bare metal or some hypervisor environments, you may need to install additional operators to enable a default
+  StorageClass. See the documentation for
+  [OpenShift Data Foundation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation) or the
+  [LVM Storage Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
+  documentation for installation on bare metal
 - OpenShift cluster has GPUs available
-- The NVIDIA GPU Operator is installed and configured with a ClusterPolicy to configure the driver
+- The NVIDIA GPU Operator is installed and configured with a ClusterPolicy (or other API) to configure the driver and
+  make the resources available to Kubernetes to schedule
 - You do not have other workloads or configurations in the cluster, such as:
   - An identity provider deployed and configured
   - Red Hat OpenShift AI installed
@@ -107,7 +117,7 @@ deploying the quickstart with more control._
 
 1. git clone quickstart repository
 
-``` 
+```
 git clone https://github.com/rh-ai-quickstart/maas-code-assistant.git
 ```
 
@@ -123,7 +133,8 @@ cd maas-code-assistant
 oc whoami
 ```
 
-4. Run all-in-one.sh. Enter passwords for the admin and user accounts when prompted.
+4. Run all-in-one.sh. Enter passwords for the admin and user accounts when prompted (these will be saved in the `.env`
+   file after the first run of the script).
 
 ```
 ./all-in-one.sh
@@ -135,12 +146,6 @@ To remove the core quickstart components (models, Dev Spaces workspaces, etc.) r
 
 ```
 helm uninstall maas-code-assistant
-```
-
-To remove the Developer Preview of MaaS, run this afterwards:
-
-```
-oc delete -k ./dev-preview
 ```
 
 To clean up other dependencies, such as Red Hat Connectivity Link and OpenShift AI, follow their documented
@@ -187,21 +192,28 @@ The following prerequisites are required in your environment to prevent any conf
 - Red Hat OpenShift Dev Spaces is deployed,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.26/html-single/administration_guide/index#installing-devspaces-on-openshift-using-the-web-console).
   - A basic CheCluster resource is configured, as in steps 2 and 3 of the above.
-- Red Hat OpenShift AI version 3.2.0 has been deployed from the fast-3.x channel,
-  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
+- The cert-manager Operator for Red Hat OpenShift has been deployed
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift).
+- The Leader Worker Set Operator has been deployed,
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ai_workloads/leader-worker-set-operator#lws-install-operator_lws-managing).
+- Red Hat OpenShift AI version 3.3.0 has been deployed from the fast-3.x, stable-3.x, or stable-3.3 channels,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
   - A Data Science Cluster has been created that enables at least the Dashboard, KServe, and Llama Stack Operator
     components,
-    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-and-managing-openshift-ai-components_component-install).
-  - Note that using **Manual** approval mode with the **startingCSV** set to `rhods-operator.3.2.0` is recommended to
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-and-managing-openshift-ai-components_component-install).
+  - Note that using **Manual** approval mode with the **startingCSV** set to `rhods-operator.3.3.0` is recommended to
     stay on the version tested with this code base.
 - Red Hat Connectivity Link has been deployed from the stable channel,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/rhcl-install-ocp-web-console_connectivity-link).
   - A `Kuadrant` resource has been installed in the `kuadrant-system` namespace,
     [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/install-on-ocp-cmd_connectivity-link#:~:text=To%20create%20your%20Connectivity%20Link%20deployment%2C%20enter%20the%20following%20command%3A).
 - You have created the `openshift-default` **GatewayClass** object for Gateway API in OpenShift, and are able to create
-  Gateway instances using your clusters load balancer and infrastructure configuration. See
+  Gateway instances using your cluster's load balancer and infrastructure configuration. See
   [the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#ingress-gateway-api)
   for more details about Gateway API in OpenShift.
+- You have created the `maas-default-gateway` **Gateway** object in the `openshift-ingress` namespace using an
+  infrastructure configuration that is supported for your environment and it shows that it is programmed, when verified
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#prerequisite-verification_maas-deploy).
 
 ### Installation Steps
 
@@ -211,25 +223,6 @@ The following prerequisites are required in your environment to prevent any conf
 oc whoami
 oc get nodes
 ```
-
-2. Install the developer preview release of Models as a Service.
-   1. Create a namespace for the developer preview:
-
-      ```
-      oc create ns maas-api
-      ```
-
-   2. Run, from the root of the cloned repository, the following and ensure the values look correct for your cluster:
-
-      ```
-      ./dev-preview/render.sh
-      ```
-
-   3. Apply the rendered developer preview overlay with the following:
-
-      ```
-      oc apply -k ./dev-preview
-      ```
 
 3. Copy `charts/maas-code-assistant/values.yaml` to edit it:
 
@@ -246,7 +239,15 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
       oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.spec.defaultCertificate.name}{"\n"}'
       ```
 
-   2. `grafana.namespace` and `grafana.selectors`
+   2. If you are on a bare metal or non-cloud hypervisor environment, your integrated image registry might be disabled.
+      If it is, update `global.toolsImage` to refer to a container image that at least contains `oc`.
+      1. You can get one such image for your cluster by running the following:
+
+      ```
+      oc adm release info --image-for=tools
+      ```
+
+   3. `grafana.namespace` and `grafana.selectors`
       1. Use the Namespace of your `Grafana` resource for the Grafana Operator.
       2. Set `selectors` to match labels on your `Grafana` instance. For example, if you get the following output:
 
@@ -258,9 +259,6 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
       `  “app”: “grafana”`\
       `}`\
       You should set `selectors` to `app: grafana`.
-
-   3. If you have deployed the `openshift-default` GatewayClass, as instructed above, configure it to not be managed by
-      the chart by setting `openshift-ai.gatewayClass.create` to `false`.
 
 5. Update the `tiers` section to map your desired user/tier mapping for the default MaaS tiers.
    1. For example, if you have users named “bob,” “sue,” and “tom,” and would like them all to be in the enterprise
@@ -291,11 +289,6 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
 ```
 helm install maas-code-assistant ./charts/maas-code-assistant -f environment.yaml
 ```
-
-Note that, depending on your environment, the `openshift-ai-inference` Gateway may already be deployed in your cluster,
-giving you error output such as
-`Error: INSTALLATION FAILED: Unable to continue with install: Gateway "openshift-ai-inference" in namespace "openshift-ingress" exists and cannot be imported into the current release`.
-If this is the case, update your `environment.yaml` to include `openshift-ai.gateway.create` set to `false`.
 
 ## Tags
 

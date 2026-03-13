@@ -22,6 +22,12 @@ cluster-monitoring:
 tiers:
   free:
     users: []
+    requestRates:
+      - limit: 5
+        window: 2m
+    tokenRates:
+      - limit: 100
+        window: 1m
   premium:
     users:
       - user1
@@ -29,9 +35,21 @@ tiers:
       - user3
       - user4
       - user5
+    requestRates:
+      - limit: 20
+        window: 2m
+    tokenRates:
+      - limit: 10000
+        window: 1m
   enterprise:
     users:
       - admin
+    requestRates:
+      - limit: 50
+        window: 2m
+    tokenRates:
+      - limit: 20000
+        window: 1m
 
 workspace:
   namespacePrefix: wksp
@@ -43,7 +61,7 @@ workspace:
       revision: main
     image: registry.redhat.io/devspaces/udi-rhel9:3.25.0
 
-defaultServingImage: registry.redhat.io/rhaiis/vllm-cuda-rhel9:3.2.5
+defaultServingImage: registry.redhat.io/rhaiis/vllm-cuda-rhel9:3.3.0
 
 defaultModelTiers:
   - free

@@ -1,0 +1,21 @@
+apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: maas-default-gateway-authn
+spec:
+  rules:
+    authentication:
+      service-accounts:
+        cache:
+          key:
+            selector: "context.request.http.headers.authorization.@case:lower"
+          ttl: 600
+        defaults:
+          userid:
+            expression: |
+              auth.identity.user.username.split(":")[3]
+        kubernetesTokenReview:
+          audiences:
+            - maas-default-gateway-sa
+        metrics: false
+        priority: 0

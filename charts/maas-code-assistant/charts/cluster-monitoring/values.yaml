@@ -4,7 +4,6 @@ clusterMonitoringConfig:
     retention: 168h
     volumeClaimTemplate:
       spec:
-        storageClassName: gp3-csi
         volumeMode: Filesystem
         resources:
           requests:
@@ -14,7 +13,6 @@ userWorkloadMonitoringConfig:
     retention: 72h
     volumeClaimTemplate:
       spec:
-        storageClassName: gp3-csi
         volumeMode: Filesystem
         resources:
           requests:

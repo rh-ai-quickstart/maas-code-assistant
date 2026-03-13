@@ -1,5 +1,12 @@
 global:
+  wildcardDomain: apps.cluster.example.com
   toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
+
+gateways:
+  maasDefaultGateway:
+    create: true
+    useRoute: false
+    hostname: ""
 
 dataScienceCluster:
   create: true
@@ -15,6 +22,8 @@ dataScienceCluster:
     kserve:
       nim:
         managementState: Removed
+      modelsAsService:
+        managementState: Managed
       rawDeploymentServiceConfig: Headless
       managementState: Managed
     kueue:
@@ -46,12 +55,31 @@ rhcl:
   create: true
   namespace: kuadrant-system
 
+lws:
+  create: true
+
 install-operators:
   enabled: true
   operators:
     devspaces:
       enabled: true
       channel: stable
+
+    openshift-cert-manager-operator:
+      enabled: true
+      channel: stable-v1
+      namespace: cert-manager-operator
+      operatorGroup:
+        enabled: true
+
+    leader-worker-set:
+      enabled: true
+      channel: stable-v1.0
+      namespace: openshift-lws-operator
+      operatorGroup:
+        enabled: true
+      targetNamespaces:
+        - openshift-lws-operator
 
     grafana-operator:
       enabled: true
@@ -60,9 +88,9 @@ install-operators:
 
     rhods-operator:
       enabled: true
-      channel: fast-3.x
+      channel: stable-3.3
       installPlanApproval: Manual
-      startingCSV: rhods-operator.3.2.0
+      startingCSV: rhods-operator.3.3.0
       namespace: redhat-ods-operator
       operatorGroup:
         enabled: true

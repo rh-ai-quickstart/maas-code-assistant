@@ -1,12 +1,6 @@
 global:
   toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
 
-gatewayClass:
-  create: true
-
-gateway:
-  create: true
-
 dashboardConfig:
   genAiStudio: true
   modelAsService: true

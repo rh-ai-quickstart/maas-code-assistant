@@ -1,0 +1,35 @@
+{{- range $model := .Values.models }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: {{ $model.name }}-view-role
+  namespace: {{ $.Values.modelsNamespace }}
+rules:
+- apiGroups:
+  - serving.kserve.io
+  resourceNames:
+  - {{ $model.name }}
+  resources:
+  - llminferenceservices
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $model.name }}-model-get
+  namespace: {{ $.Values.modelsNamespace }}
+subjects:
+  {{- range $tier := ($model.tiers | default $.Values.defaultModelTiers) }}
+  - kind: Group
+    name: system:serviceaccounts:maas-default-gateway-tier-{{ $tier }}
+    apiGroup: rbac.authorization.k8s.io
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $model.name }}-view-role
+{{- end }}

@@ -4,4 +4,4 @@ metadata:
   name: default-dsc
 spec:
   components:
-    {{- toYaml .components | nindent 6 }}
+    {{- toYaml .Values.dataScienceCluster.components | nindent 6 }}

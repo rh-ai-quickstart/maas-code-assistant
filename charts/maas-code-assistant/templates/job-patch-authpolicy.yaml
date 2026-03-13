@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: patch-authpolicy
+  namespace: openshift-ingress
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: patch-authpolicy
+  namespace: openshift-ingress
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["kuadrant.io"]
+  resources: ["authpolicies"]
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: patch-authpolicy
+  namespace: openshift-ingress
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: patch-authpolicy
+subjects:
+  - kind: ServiceAccount
+    name: patch-authpolicy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: patch-authpolicy-script
+  namespace: openshift-ingress
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+data:
+{{ tpl (.Files.Glob "files/*").AsConfig $ | indent 2 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: patch-authpolicy
+  namespace: openshift-ingress
+  labels:
+    {{- include "maas-code-assistant.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccount: patch-authpolicy
+      serviceAccountName: patch-authpolicy
+      restartPolicy: Never
+      containers:
+      - name: patch-authpolicy
+        image: {{ .Values.global.toolsImage }}
+        imagePullPolicy: IfNotPresent
+        workingDir: /app
+        command: ["/app/patch-authpolicy-maas-default-gateway.sh"]
+        args: []
+        volumeMounts:
+          - name: patch-authpolicy-script
+            mountPath: /app
+      volumes:
+        - name: patch-authpolicy-script
+          configMap:
+            name: patch-authpolicy-script
+            defaultMode: 493

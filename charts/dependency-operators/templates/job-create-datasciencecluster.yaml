@@ -1,5 +1,4 @@
-{{- with .Values.dataScienceCluster }}
-{{- if .create }}
+{{- if .Values.dataScienceCluster.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -7,6 +6,21 @@ metadata:
   namespace: redhat-ods-operator
   labels:
     {{- include "dependency-operators.labels" $ | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: create-datasciencecluster-ingress-admin
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-ingress-operator
+subjects:
+- kind: ServiceAccount
+  name: create-datasciencecluster
+  namespace: redhat-ods-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -64,5 +78,4 @@ spec:
           configMap:
             name: create-datasciencecluster
             defaultMode: 493
-{{- end }}
 {{- end }}

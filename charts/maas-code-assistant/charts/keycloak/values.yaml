@@ -6,6 +6,8 @@ name: keycloak
 namespace: keycloak
 replicas: 1
 
+ingressCA: ""
+
 realm:
   create: true
   name: sso
