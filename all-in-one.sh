@@ -93,10 +93,10 @@ else
 fi
 
 if ! $processed; then
-  for operator in $(oc get subscriptions -A -ojsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null); do
-    sed -i '/^\s*'"$operator"':$/{n; s/enabled: true/enabled: false/;}' environment.yaml
+  for operator in $(oc get subscriptions -A -ojsonpath='{range .items[*]}{.spec.name}{"\n"}{end}' 2>/dev/null); do
+    sed '/^[[:space:]]*'"$operator"':$/{n; s/enabled: true/enabled: false/;}' environment.yaml > environment.yaml.tmp && mv environment.yaml.tmp environment.yaml
   done
-  sed -i 's/^\(\s*processed:\) false/\1 true/' environment.yaml
+  sed 's/^\([[:space:]]*processed:\) false/\1 true/' environment.yaml > environment.yaml.tmp && mv environment.yaml.tmp environment.yaml
 fi
 
 echo "environment.yaml:"
