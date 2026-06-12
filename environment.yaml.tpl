@@ -12,6 +12,9 @@ gateways:
   maasDefaultGateway:
     useRoute: ${GATEWAY_USE_ROUTE}
 
+clusterMonitoring:
+  enabled: ${MONITORING_CONFIG}
+
 install-operators:
   processed: false
   operators:

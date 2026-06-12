@@ -82,6 +82,13 @@ else
 fi
 export GATEWAY_USE_ROUTE
 
+MONITORING_CONFIG=true
+if oc get configmap -n openshift-monitoring cluster-monitoring-config >/dev/null 2>&1; then
+  echo "WARNING: Detected an existing cluster monitoring config. Ensure user-workload monitoring is enabled yourself for metrics to work!" >&2
+  MONITORING_CONFIG=false
+fi
+export MONITORING_CONFIG
+
 if [ -f environment.yaml ]; then
   if ! grep -qF "$INGRESS_DOMAIN" environment.yaml; then
     echo "ERROR: You have an environment.yaml file templated, but it doesn't match the cluster you're logged into right now!" >&2
