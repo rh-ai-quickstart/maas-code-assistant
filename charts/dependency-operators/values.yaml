@@ -78,6 +78,7 @@ install-operators:
       enabled: true
       channel: stable
       namespace: kuadrant-system
+      startingCSV: rhcl-operator.v1.3.3
       operatorGroup:
         enabled: true
 
