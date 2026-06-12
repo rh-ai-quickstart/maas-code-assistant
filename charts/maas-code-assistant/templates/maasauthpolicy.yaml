@@ -1,0 +1,25 @@
+{{- range $name, $sub := .Values.subscriptions }}
+{{- if $sub.groups }}
+---
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSAuthPolicy
+metadata:
+  name: {{ $name }}-policy
+  namespace: models-as-a-service
+  annotations:
+    openshift.io/description: Auth policy created for subscription "{{ $name }}"
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+spec:
+  modelRefs:
+  {{- range $model, $rateLimits := $sub.tokenRateLimits }}
+  - name: {{ $model }}
+    namespace: {{ $.Values.modelsNamespace }}
+  {{- end }}
+  {{- with $sub.groups }}
+  subjects:
+    groups:
+      {{- toYaml . | nindent 6 }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -62,7 +62,7 @@ metadata:
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 data:
-{{ tpl (.Files.Glob "files/*").AsConfig $ | indent 2 }}
+{{ tpl (.Files.Glob "files/*odhdashboardconfig*").AsConfig $ | indent 2 }}
 ---
 apiVersion: batch/v1
 kind: Job

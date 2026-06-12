@@ -1,0 +1,28 @@
+{{- range $name, $sub := .Values.subscriptions }}
+---
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSSubscription
+metadata:
+  name: {{ $name }}
+  namespace: models-as-a-service
+  annotations:
+    openshift.io/display-name: {{ $sub.displayName | default (title $name) }}
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+spec:
+  modelRefs:
+  {{- range $model, $rateLimit := $sub.tokenRateLimits }}
+  - name: {{ $model }}
+    namespace: {{ $.Values.modelsNamespace }}
+    {{- with $rateLimit }}
+    tokenRateLimits:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- with $sub.groups }}
+  owner:
+    groups:
+      {{- toYaml . | nindent 6 }}
+  {{- end }}
+  priority: {{ $sub.priority | default 0 }}
+{{- end }}

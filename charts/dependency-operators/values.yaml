@@ -11,45 +11,29 @@ gateways:
 dataScienceCluster:
   create: true
   components:
-    aipipelines:
-      argoWorkflowsControllers:
-        managementState: Removed
-      managementState: Removed
     dashboard:
       managementState: Managed
-    feastoperator:
-      managementState: Removed
     kserve:
-      nim:
-        managementState: Removed
       modelsAsService:
         managementState: Managed
-      rawDeploymentServiceConfig: Headless
       managementState: Managed
-    kueue:
-      defaultClusterQueueName: default
-      defaultLocalQueueName: default
-      managementState: Removed
     llamastackoperator:
       managementState: Managed
-    mlflowoperator:
-      managementState: Removed
-    modelregistry:
-      registriesNamespace: rhoai-model-registries
-      managementState: Managed
-    ray:
-      managementState: Removed
-    trainingoperator:
-      managementState: Removed
-    trustyai:
-      eval:
-        lmeval:
-          permitCodeExecution: deny
-          permitOnline: deny
-      managementState: Managed
-    workbenches:
-      workbenchNamespace: rhods-notebooks
-      managementState: Managed
+
+# used for MaaS
+postgresCluster:
+  create: true
+  name: maas
+  namespace: maas-db
+  storage:
+    size: 5Gi
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
 
 rhcl:
   create: true
@@ -81,16 +65,11 @@ install-operators:
       targetNamespaces:
         - openshift-lws-operator
 
-    grafana-operator:
-      enabled: true
-      channel: v5
-      catalog: community-operators
-
     rhods-operator:
       enabled: true
-      channel: stable-3.3
+      channel: stable-3.4
       installPlanApproval: Manual
-      startingCSV: rhods-operator.3.3.0
+      startingCSV: rhods-operator.3.4.0
       namespace: redhat-ods-operator
       operatorGroup:
         enabled: true
@@ -98,11 +77,17 @@ install-operators:
     rhcl-operator:
       enabled: true
       channel: stable
+      namespace: kuadrant-system
+      operatorGroup:
+        enabled: true
 
     cloudnative-pg:
       enabled: true
       channel: stable-v1
       catalog: certified-operators
+      namespace: cloudnative-pg
+      operatorGroup:
+        enabled: true
 
     rhbk-operator:
       enabled: true
@@ -112,3 +97,17 @@ install-operators:
         enabled: true
       targetNamespaces:
         - keycloak
+
+    cluster-observability-operator:
+      enabled: true
+      channel: stable
+      namespace: openshift-cluster-observability-operator
+      operatorGroup:
+        enabled: true
+
+    opentelemetry-product:
+      enabled: true
+      channel: stable
+      namespace: opentelemetry-operator
+      operatorGroup:
+        enabled: true

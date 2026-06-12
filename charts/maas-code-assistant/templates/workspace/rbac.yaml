@@ -1,5 +1,5 @@
 {{- if .Values.workspace.enabled }}
-{{- range $user := ((include "maas-code-assistant.users" .) | fromJsonArray)  }}
+{{- range $user := .Values.users }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

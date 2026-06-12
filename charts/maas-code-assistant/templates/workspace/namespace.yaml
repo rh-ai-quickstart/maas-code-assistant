@@ -1,5 +1,5 @@
 {{- if .Values.workspace.enabled }}
-{{- range $user := ((include "maas-code-assistant.users" .) | fromJsonArray)  }}
+{{- range $user := .Values.users }}
 ---
 apiVersion: v1
 kind: Namespace

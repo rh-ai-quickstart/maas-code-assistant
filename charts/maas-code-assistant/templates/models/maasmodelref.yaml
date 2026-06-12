@@ -1,0 +1,14 @@
+{{- range .Values.models }}
+---
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: MaaSModelRef
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.modelsNamespace }}
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+spec:
+  modelRef:
+    kind: LLMInferenceService
+    name: {{ .name }}
+{{- end }}

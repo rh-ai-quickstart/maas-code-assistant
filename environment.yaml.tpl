@@ -21,8 +21,6 @@ install-operators:
       enabled: true
     leader-worker-set:
       enabled: true
-    grafana-operator:
-      enabled: true
     rhods-operator:
       enabled: true
     rhcl-operator:
@@ -30,4 +28,8 @@ install-operators:
     cloudnative-pg:
       enabled: true
     rhbk-operator:
+      enabled: true
+    cluster-observability-operator:
+      enabled: true
+    opentelemetry-product:
       enabled: true

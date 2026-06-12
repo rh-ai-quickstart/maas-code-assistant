@@ -36,6 +36,47 @@ subjects:
 - kind: ServiceAccount
   name: create-datasciencecluster
   namespace: redhat-ods-operator
+{{- with $db := .Values.postgresCluster }}
+{{- if $db.create }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $db.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-maas-db-config-edit
+  namespace: {{ $db.namespace }}
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: create-datasciencecluster
+    namespace: redhat-ods-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-maas-db-config-edit
+  namespace: redhat-ods-applications
+  labels:
+    {{- include "dependency-operators.labels" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: create-datasciencecluster
+    namespace: redhat-ods-operator
+{{- end }}
+{{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap

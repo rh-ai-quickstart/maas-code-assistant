@@ -33,7 +33,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: create-kuadrant-olm-view
-  namespace: openshift-operators
+  namespace: {{ .Values.rhcl.namespace }}
   labels:
     {{- include "dependency-operators.labels" . | nindent 4 }}
 roleRef:
@@ -50,22 +50,6 @@ kind: RoleBinding
 metadata:
   name: create-kuadrant-namespace-edit
   namespace: {{ .Values.rhcl.namespace }}
-  labels:
-    {{- include "dependency-operators.labels" . | nindent 4 }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: edit
-subjects:
-  - kind: ServiceAccount
-    name: create-kuadrant
-    namespace: {{ .Values.rhcl.namespace }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: create-kuadrant-namespace-edit
-  namespace: openshift-operators
   labels:
     {{- include "dependency-operators.labels" . | nindent 4 }}
 roleRef:

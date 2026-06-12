@@ -10,7 +10,7 @@ rhcl_operators=(
 )
 
 function operator_ready {
-  [ "$(oc get -n openshift-operators subscription -l "operators.coreos.com/${1}-operator.openshift-operators" -ojsonpath='{.items[0].status.state}' 2>&1 ||:)" = "AtLatestKnown" ]
+  [ "$(oc get subscription -l "operators.coreos.com/${1}-operator.kuadrant-system" -ojsonpath='{.items[0].status.state}' 2>&1 ||:)" = "AtLatestKnown" ]
 }
 
 echo -n 'Waiting for dependencies to be installed'
@@ -24,9 +24,9 @@ echo
 
 set -x
 
-oc delete pod -n openshift-operators -l app=kuadrant,control-plane=controller-manager
+oc delete pod -l app=kuadrant,control-plane=controller-manager
 sleep 1
-oc rollout status -n openshift-operators deployment/kuadrant-operator-controller-manager
+oc rollout status deployment/kuadrant-operator-controller-manager
 oc apply -f kuadrant.yaml
 sleep 1
 oc wait --for=condition=Ready kuadrant kuadrant --timeout 15m0s
