@@ -14,7 +14,7 @@ subscriptions:
   admin:
     displayName: MaaS Admins
     groups:
-      - admin
+      - name: admin
     tokenRateLimits:
       nemotron-3-nano-30b-a3b:
         - limit: 100000
@@ -22,7 +22,7 @@ subscriptions:
   users:
     displayName: MaaS Users
     groups:
-      - user
+      - name: user
     tokenRateLimits:
       nemotron-3-nano-30b-a3b:
         - limit: 50000
