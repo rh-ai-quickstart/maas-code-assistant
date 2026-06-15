@@ -80,6 +80,7 @@ hardwareProfiles:
 dashboardConfig:
   genAiStudio: true
   modelAsService: true
+  maasAuthPolicies: true
   observabilityDashboard: true
 
 clusterMonitoring:
