@@ -52,6 +52,8 @@ spec:
             temporary: false
         realmRoles:
           - user
+        groups:
+          - users
       {{- end }}
       - username: {{ .Values.realm.admin.username }}
         enabled: true
@@ -65,6 +67,8 @@ spec:
             temporary: false
         realmRoles:
           - admin
+        groups:
+          - admins
     groups:
       - name: admins
       - name: users
