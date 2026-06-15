@@ -59,6 +59,7 @@ spec:
       kind: ConfigMap
       name: maas-default-gateway-config
   listeners:
+    {{- if .useRoute }}
     - name: http
       port: 80
       protocol: HTTP
@@ -66,7 +67,7 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    {{- if not .useRoute }}
+    {{- else }}
     - name: https
       port: 443
       protocol: HTTPS
