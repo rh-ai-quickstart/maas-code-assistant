@@ -32,4 +32,8 @@ sleep 1
 oc wait --for=condition=Ready kuadrant kuadrant --timeout 15m0s
 sleep 1
 oc annotate service authorino-authorino-authorization service.beta.openshift.io/serving-cert-secret-name=authorino-server-cert --overwrite
+sleep 1
 oc patch authorino authorino --type=merge --patch '{"spec": {"listener": {"tls": {"enabled": true, "certSecretRef": {"name": "authorino-server-cert"}}}}}'
+sleep 1
+oc set env deployment/authorino SSL_CERT_FILE=/etc/ssl/certs/openshift-service-ca/service-ca-bundle.crt REQUESTS_CA_BUNDLE=/etc/ssl/certs/openshift-service-ca/service-ca-bundle.crt
+sleep 1
