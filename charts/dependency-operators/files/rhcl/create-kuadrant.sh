@@ -37,3 +37,4 @@ oc patch authorino authorino --type=merge --patch '{"spec": {"listener": {"tls":
 sleep 1
 oc set env deployment/authorino SSL_CERT_FILE=/etc/ssl/certs/openshift-service-ca/service-ca-bundle.crt REQUESTS_CA_BUNDLE=/etc/ssl/certs/openshift-service-ca/service-ca-bundle.crt
 sleep 1
+oc rollout status deployment/authorino --timeout=5m
