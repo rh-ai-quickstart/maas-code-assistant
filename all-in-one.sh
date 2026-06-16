@@ -16,11 +16,25 @@ if [ -z "$ADMIN_PASSWORD" ]; then
   echo
   echo "ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"" >> .env
 fi
+export ADMIN_PASSWORD
 if [ -z "$USER_PASSWORD" ]; then
   read -rsp 'Enter a password to set for the generated users (user1-user5 by default): ' USER_PASSWORD
   echo
   echo "USER_PASSWORD=\"$USER_PASSWORD\"" >> .env
 fi
+export USER_PASSWORD
+if [ -z "$REMOVE_KUBE_ADMIN" ]; then
+  read -rn 1 -p 'Do you want to remove the kubeadmin user, if it exists? [y/N]: ' answer
+  if [ "${answer,,}" = "y" ]; then
+    echo "Removing kubeadmin while stitching up keycloak..." >&2
+    REMOVE_KUBE_ADMIN=true
+  else
+    echo "Leaving kubeadmin user..." >&2
+    REMOVE_KUBE_ADMIN=false
+  fi
+  echo "REMOVE_KUBE_ADMIN=\"$REMOVE_KUBE_ADMIN\"" >> .env
+fi
+export REMOVE_KUBE_ADMIN
 
 function noisy {
   local censored=()

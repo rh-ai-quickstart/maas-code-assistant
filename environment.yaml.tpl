@@ -4,7 +4,7 @@ global:
   toolsImage: ${TOOLS_IMAGE}
 
 keycloak:
-  removeKubeAdmin: false
+  removeKubeAdmin: ${REMOVE_KUBE_ADMIN}
   realm:
     openshiftClientSecret: "${KEYCLOAK_CLIENT_SECRET}"
   ingressCA: |-
