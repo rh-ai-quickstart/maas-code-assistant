@@ -12,15 +12,16 @@ function approve_install_plan {
   { set +x ; } 2>/dev/null
 }
 
-# Shorten the label until it fits
-label={{ $operator }}.{{ $config.namespace | default "openshift-operators" }}
-while [ "$(echo -n "$label" | wc -c)" -gt 63 ]; do
-  label="$(echo "$label" | rev | cut -d- -f2- | rev)"
-done
-echo $label
 
 function find_install_plan {
-  oc get installplan -l "operators.coreos.com/$label" -ojsonpath='{.items[?(@.spec.clusterServiceVersionNames contains "{{ $config.startingCSV }}")].metadata.name}' 2>/dev/null
+  oc get installplan -ogo-template='
+    {{ "{{-" }} range $ip := .items {{ "}}" }}
+      {{ "{{-" }} range .spec.clusterServiceVersionNames {{ "}}" }}
+        {{ "{{-" }} if eq . "{{ $config.startingCSV }}" {{ "}}" }}
+          {{ "{{-" }} $ip.metadata.name }}{{ break {{ "}}" }}
+        {{ "{{-" }} end {{ "}}" }}
+      {{ "{{-" }} end {{ "}}" }}
+    {{ "{{-" }} end {{ "}}" }}' 2>/dev/null
 }
 
 while true; do
