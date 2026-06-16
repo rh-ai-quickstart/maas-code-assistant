@@ -10,8 +10,14 @@ function approve_install_plan {
   { set +x ; } 2>/dev/null
 }
 
+# Shorten the label until it fits
+label=operators.coreos.com/{{ $operator }}.{{ $config.namespace | default "openshift-operators" }}
+while [ "$(echo -n "$label" | wc -c)" -gt 63 ]; do
+  label="$(echo "$label" | rev | cut -d- -f2- | rev)"
+done
+
 function find_install_plan {
-  oc get installplan -l operators.coreos.com/{{ $operator }}.{{ $config.namespace | default "openshift-operators" }} -ojsonpath='{.items[?(@.spec.clusterServiceVersionNames contains "{{ $config.startingCSV }}")].metadata.name}' 2>/dev/null
+  oc get installplan -l "$label" -ojsonpath='{.items[?(@.spec.clusterServiceVersionNames contains "{{ $config.startingCSV }}")].metadata.name}' 2>/dev/null
 }
 
 echo -n 'Waiting for InstallPlan.'
