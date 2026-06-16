@@ -3,6 +3,8 @@
 {{- $operator := index . 0 }}
 {{- $config := index . 1 }}
 
+set -ex
+
 function approve_install_plan {
   installplan=$1
   set -x
@@ -11,16 +13,16 @@ function approve_install_plan {
 }
 
 # Shorten the label until it fits
-label=operators.coreos.com/{{ $operator }}.{{ $config.namespace | default "openshift-operators" }}
+label={{ $operator }}.{{ $config.namespace | default "openshift-operators" }}
 while [ "$(echo -n "$label" | wc -c)" -gt 63 ]; do
   label="$(echo "$label" | rev | cut -d- -f2- | rev)"
 done
+echo $label
 
 function find_install_plan {
-  oc get installplan -l "$label" -ojsonpath='{.items[?(@.spec.clusterServiceVersionNames contains "{{ $config.startingCSV }}")].metadata.name}' 2>/dev/null
+  oc get installplan -l "operators.coreos.com/$label" -ojsonpath='{.items[?(@.spec.clusterServiceVersionNames contains "{{ $config.startingCSV }}")].metadata.name}' 2>/dev/null
 }
 
-echo -n 'Waiting for InstallPlan.'
 while true; do
   install_plan=$(find_install_plan)
   if [ "$install_plan" ]; then
@@ -28,6 +30,5 @@ while true; do
     approve_install_plan "$install_plan"
     break
   fi
-  echo -n '.'
   sleep 1
 done
