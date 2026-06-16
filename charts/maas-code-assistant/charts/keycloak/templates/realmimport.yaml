@@ -18,6 +18,26 @@ spec:
     registrationAllowed: false
     loginWithEmailAllowed: true
     duplicateEmailsAllowed: false
+    clientScopes:
+      - name: groups
+        protocol: openid-connect
+        attributes:
+          include.in.token.scope: "true"
+          display.on.consent.screen: "true"
+          include.in.openid.provider.metadata: "true"
+        protocolMappers:
+          - name: groups
+            protocol: openid-connect
+            protocolMapper: oidc-usermodel-realm-role-mapper
+            consentRequired: false
+            config:
+              introspection.token.claim: "true"
+              multivalued: "true"
+              user.attribute: "foo"
+              id.token.claim: "true"
+              access.token.claim: "true"
+              claim.name: groups
+              jsonType.label: "String"
     clients:
       - clientId: {{ .Values.realm.openshiftClientId }}
         enabled: true
@@ -31,6 +51,15 @@ spec:
         serviceAccountsEnabled: true
         frontchannelLogout: false
         protocol: openid-connect
+        defaultClientScopes:
+        - acr
+        - basic
+        - email
+        - groups
+        - profile
+        - roles
+        - service_account
+        - web-origins
     roles:
       realm:
         - name: user
