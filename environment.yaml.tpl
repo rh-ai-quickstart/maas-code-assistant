@@ -5,6 +5,8 @@ global:
 
 keycloak:
   removeKubeAdmin: false
+  realm:
+    openshiftClientSecret: "${KEYCLOAK_CLIENT_SECRET}"
   ingressCA: |-
 $(echo "${INGRESS_CA}" | sed 's/^/    /')
 

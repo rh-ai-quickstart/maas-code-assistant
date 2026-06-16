@@ -89,6 +89,9 @@ if oc get configmap -n openshift-monitoring cluster-monitoring-config >/dev/null
 fi
 export MONITORING_CONFIG
 
+KEYCLOAK_CLIENT_SECRET=$(LC_ALL=C tr -dc 'A-Za-z0-9_!@#$%^&*()\-+=' < /dev/urandom | head -c32)
+export KEYCLOAK_CLIENT_SECRET
+
 if [ -f environment.yaml ]; then
   if ! grep -qF "$INGRESS_DOMAIN" environment.yaml; then
     echo "ERROR: You have an environment.yaml file templated, but it doesn't match the cluster you're logged into right now!" >&2
