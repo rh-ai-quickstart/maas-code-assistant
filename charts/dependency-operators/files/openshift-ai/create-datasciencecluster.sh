@@ -20,6 +20,7 @@ oc create secret generic maas-db-config -n redhat-ods-applications --from-litera
 {{- end }}
 {{- end }}
 
+oc apply -f dscinitialization.yaml
 while ! oc apply -f datasciencecluster.yaml; do
   sleep 5
 done
