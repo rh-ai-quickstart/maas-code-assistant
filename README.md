@@ -321,3 +321,4 @@ helm install maas-code-assistant ./charts/maas-code-assistant -f environment.yam
 - **Product**: Red Hat AI Enterprise
 - **Use case**: Code development
 - **Industry**: Adopt and scale AI
+- **Partner**: NVIDIA
