@@ -18,7 +18,11 @@ function find_install_plan {
     {{ "{{-" }} range $ip := .items {{ "}}" }}
       {{ "{{-" }} range .spec.clusterServiceVersionNames {{ "}}" }}
         {{ "{{-" }} if eq . "{{ $config.startingCSV }}" {{ "}}" }}
-          {{ "{{-" }} $ip.metadata.name {{ "}}{{" }} break {{ "}}" }}
+          {{ "{{-" }} if $ip.status {{ "}}" }}
+            {{ "{{-" }} if or (eq $ip.status.phase "RequiresApproval") (eq $ip.status.phase "Complete") {{ "}}" }}
+              {{ "{{-" }} $ip.metadata.name {{ "}}{{" }} break {{ "}}" }}
+            {{ "{{-" }} end {{ "}}" }}
+          {{ "{{-" }} end {{ "}}" }}
         {{ "{{-" }} end {{ "}}" }}
       {{ "{{-" }} end {{ "}}" }}
     {{ "{{-" }} end {{ "}}" }}' 2>/dev/null
