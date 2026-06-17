@@ -18,7 +18,7 @@ function find_install_plan {
     {{ "{{-" }} range $ip := .items {{ "}}" }}
       {{ "{{-" }} range .spec.clusterServiceVersionNames {{ "}}" }}
         {{ "{{-" }} if eq . "{{ $config.startingCSV }}" {{ "}}" }}
-          {{ "{{-" }} $ip.metadata.name }}{{ break {{ "}}" }}
+          {{ "{{-" }} $ip.metadata.name {{ "}}{{" }} break {{ "}}" }}
         {{ "{{-" }} end {{ "}}" }}
       {{ "{{-" }} end {{ "}}" }}
     {{ "{{-" }} end {{ "}}" }}' 2>/dev/null
