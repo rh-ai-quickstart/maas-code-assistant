@@ -15,6 +15,14 @@ gateways:
         cpu: "2"
         memory: 2Gi
 
+dataScienceClusterInitialization:
+  monitoring:
+    metrics:
+      replicas: 1
+      storage:
+        retention: 90d
+        size: 5Gi
+
 dataScienceCluster:
   create: true
   components:
