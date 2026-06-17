@@ -48,6 +48,7 @@ models:
       - --enable-auto-tool-choice
       - --tool-call-parser=qwen3_coder
       - --trust-remote-code
+      - --enable-force-include-usage
       - --reasoning-parser-plugin=/mnt/models/nano_v3_reasoning_parser.py
       - --reasoning-parser=nano_v3
     tolerations:
