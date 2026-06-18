@@ -4,5 +4,5 @@ metadata:
   name: default-dsci
 {{- with .Values.dataScienceClusterInitialization }}
 spec:
-  {{- toYaml . | nindent 2 }}
+  {{- toYaml . | nindent 4 }}
 {{- end }}
