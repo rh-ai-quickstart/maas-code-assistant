@@ -9,8 +9,12 @@ metadata:
     openshift.io/display-name: {{ .displayName | default (.name | replace "-" " " | title) }}
     opendatahub.io/model-type: generative
     opendatahub.io/genai-use-case: {{ .useCase | default "code-assistant" }}
-    opendatahub.io/hardware-profile-name: {{ dig "hardwareProfile" "name" "gpu" . }}
-    opendatahub.io/hardware-profile-namespace: {{ dig "hardwareProfile" "namespace" "redhat-ods-applications" . }}
+    {{-  with .hardwareProfile }}
+    {{- if .enabled }}
+    opendatahub.io/hardware-profile-name: {{ .name }}
+    opendatahub.io/hardware-profile-namespace: {{ .namespace }}
+    {{- end }}
+    {{- end }}
   labels:
     {{- include "maas-code-assistant.labels" $ | nindent 4 }}
     opendatahub.io/dashboard: "true"

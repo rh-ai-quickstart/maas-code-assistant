@@ -34,6 +34,10 @@ models:
   - name: nemotron-3-nano-30b-a3b
     displayName: NVIDIA Nemotron 3 Nano 30B A3B FP8
     uri: oci://quay.io/jharmison/models:redhatai--nvidia-nemotron-3-nano-30b-a3b-fp8-modelcar
+    hardwareProfile:
+      enabled: true
+      name: gpu
+      namespace: redhat-ods-applications
     resources:
       limits:
         cpu: "4"
