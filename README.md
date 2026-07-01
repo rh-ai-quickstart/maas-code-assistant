@@ -255,6 +255,8 @@ The following prerequisites are required in your environment to prevent any conf
     [charts/dependency-operators/files/openshift-ai/cluster.yaml](charts/dependency-operators/files/openshift-ai/cluster.yaml).
     You can use this template as the basis of a custom manifest by removing the templating syntax and configuring it
     according to [the documentation](https://cloudnative-pg.io/docs/1.29/bootstrap#bootstrap-an-empty-cluster-initdb).
+    - CloudNativePG can be installed from Operator Hub by navigating to Ecosystem and Software Catalog in the left
+      navigation bar on your OpenShift Console. It's discoverable easily by searching for `cnpg`.
 
 ### Installation Steps
 
