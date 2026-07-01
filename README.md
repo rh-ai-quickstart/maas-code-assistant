@@ -281,6 +281,8 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
       oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.status.domain}{"\n"}'
       oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.spec.defaultCertificate.name}{"\n"}'
       ```
+      2. If the second command doesn't return anything for the `defaultCertificate.name`, OpenShift uses the default
+         name of `router-certs-default`, which is why it is set as the default.
 
    2. If you are on a bare metal or non-cloud hypervisor environment, your integrated image registry might be disabled.
       If it is, update `global.toolsImage` to refer to a container image that at least contains `oc`.

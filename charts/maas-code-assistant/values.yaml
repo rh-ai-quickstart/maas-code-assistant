@@ -1,6 +1,6 @@
 global:
   wildcardDomain: apps.cluster.example.com
-  wildcardCertName: cert-manager-ingress-cert
+  wildcardCertName: router-certs-default
   toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
 
 users:
