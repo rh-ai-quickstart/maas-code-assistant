@@ -328,6 +328,13 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
    [pod template](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors), etc. It is
    not recommended that you change other options, such as the `extraArgs` array to ensure that the model is correctly
    configured for agentic code assistance tasks to complete the user tasks.
+   1. Note that the `hardwareProfile` section of the model currently points to the chart-managed HardwareProfile, which
+      is configured in the `hardwareProfiles` section of the values. This is to integrate the API-managed resources with
+      the OpenShift AI dashboard, where HardwareProfiles are typically consumed. You can disable HardwareProfile
+      association with your models safely if you don't want to do additional tuning to the hardwareProfiles, and can set
+      the top-level values key for `hardwareProfiles` to `null` to avoid managing them. Alternatively, just make sure
+      that you're using a HardwareProfile name that matches what's configured (whether by the chart or not) to integrate
+      cleanly with the UI.
 
 8. Install the quickstart with helm:
 
