@@ -94,14 +94,14 @@ deploying the quickstart with more control._
 
 - OpenShift cluster (specific version is specified in the software requirements section)
   - Optional (recommended): trusted certificates managed for the OpenShift Router,
-    [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/configuring-certificates#replacing-default-ingress_replacing-default-ingress)
+    [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/security_and_compliance/configuring-certificates#replacing-default-ingress_replacing-default-ingress)
 - A default
-  [StorageClass](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage)
+  [StorageClass](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/storage/understanding-persistent-storage)
   needs to be configured. If your cluster is on a cloud provider, this is probably available out of the box. If you're
   on bare metal or some hypervisor environments, you may need to install additional operators to enable a default
   StorageClass. See the documentation for
   [OpenShift Data Foundation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation) or the
-  [LVM Storage Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
+  [LVM Storage Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
   documentation for installation on bare metal
 - OpenShift cluster has GPUs available
 - The NVIDIA GPU Operator is installed and configured with a ClusterPolicy (or other API) to configure the driver and
@@ -190,9 +190,9 @@ Use this deployment path if you:
 The following prerequisites are required in your environment to prevent any conflicts with the quickstart:
 
 - Users have been configured with OpenShift OAuth, backed by OIDC or some other auth method such as htpasswd,
-  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/postinstallation_configuration/post-install-preparing-for-users).
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/postinstallation_configuration/post-install-preparing-for-users).
 - OpenShift cluster and user-workload monitoring is configured,
-  [as documented](https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.20/html-single/configuring_user_workload_monitoring/index).
+  [as documented](https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.22/html-single/configuring_user_workload_monitoring/index).
 - The OpenShift Cluster Observability Operator has been deployed
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_cluster_observability_operator/1-latest/html/installing_red_hat_openshift_cluster_observability_operator/index).
   - You need to pin this to version 1.4.0 during the installation. 1.5.0 has some incompatibilities that will be
@@ -201,9 +201,9 @@ The following prerequisites are required in your environment to prevent any conf
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.26/html-single/administration_guide/index#installing-devspaces-on-openshift-using-the-web-console).
   - A basic CheCluster resource is configured, as in steps 2 and 3 of the above.
 - The cert-manager Operator for Red Hat OpenShift has been deployed
-  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift).
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift).
 - The Leader Worker Set Operator has been deployed,
-  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ai_workloads/leader-worker-set-operator#lws-install-operator_lws-managing).
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/ai_workloads/leader-worker-set-operator#lws-install-operator_lws-managing).
 - Red Hat OpenShift AI version 3.4 has been deployed from the stable-3.x or stable-3.4 channels,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
   - The `DSCInitialization` has been modified to enable OpenShift AI metrics,
@@ -230,9 +230,13 @@ The following prerequisites are required in your environment to prevent any conf
     oc patch authorino -n kuadrant-system authorino --type=merge --patch '{"spec": {"listener": {"tls": {"enabled": true, "certSecretRef": {"name": "authorino-server-cert"}}}}}'
     ```
 - You have created the `openshift-default` **GatewayClass** object for Gateway API in OpenShift, and are able to create
-  Gateway instances using your cluster's load balancer and infrastructure configuration. See
-  [the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#ingress-gateway-api)
-  for more details about Gateway API in OpenShift.
+  Gateway instances using your cluster's load balancer and infrastructure configuration.
+  - See
+    [the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#ingress-gateway-api)
+    for more details about Gateway API in OpenShift.
+  - An example infrastructure that requires other pre-work or consideration is bare-metal installation. See the
+    [section of the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/ingress_and_load_balancing/configuring-gateway-api#on-premise-gateway-routing-requirements_assigning-network-addresses-gateways)
+    on this topic for more details.
 - You have created the `maas-default-gateway` **Gateway** object in the `openshift-ingress` namespace using an
   infrastructure configuration that is supported for your environment and it shows that it is programmed, when verified
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#maas-prerequisites_maas-deploy).
