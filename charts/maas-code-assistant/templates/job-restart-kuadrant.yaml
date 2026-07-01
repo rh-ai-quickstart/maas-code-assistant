@@ -1,9 +1,9 @@
-{{- if .Values.restartKuadrant }}
+{{- if .Values.kuadrant.restart }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: restart-kuadrant
-  namespace: openshift-operators
+  namespace: {{ .Values.kuadrant.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 ---
@@ -11,7 +11,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: restart-kuadrant-namespace-edit
-  namespace: openshift-operators
+  namespace: {{ .Values.kuadrant.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 roleRef:
@@ -21,13 +21,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: restart-kuadrant
-    namespace: openshift-operators
+    namespace: {{ .Values.kuadrant.namespace }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: restart-kuadrant-script
-  namespace: openshift-operators
+  namespace: {{ .Values.kuadrant.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 data:
@@ -37,7 +37,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: restart-kuadrant
-  namespace: openshift-operators
+  namespace: {{ .Values.kuadrant.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
   annotations:

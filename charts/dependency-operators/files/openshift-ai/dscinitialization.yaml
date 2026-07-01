@@ -1,0 +1,8 @@
+apiVersion: dscinitialization.opendatahub.io/v2
+kind: DSCInitialization
+metadata:
+  name: default-dsci
+{{- with .Values.dataScienceClusterInitialization }}
+spec:
+  {{- toYaml . | nindent 4 }}
+{{- end }}

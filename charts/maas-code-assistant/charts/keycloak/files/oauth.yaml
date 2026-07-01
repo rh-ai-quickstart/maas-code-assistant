@@ -19,6 +19,10 @@ spec:
             - name
           preferredUsername:
             - preferred_username
+            - email
+            - name
+          groups:
+            - groups
         clientID: >-
           {{ .Values.realm.openshiftClientId }}
         clientSecret:

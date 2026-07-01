@@ -1,104 +1,43 @@
 global:
   wildcardDomain: apps.cluster.example.com
-  wildcardCertName: cert-manager-ingress-cert
+  wildcardCertName: router-certs-default
   toolsImage: image-registry.openshift-image-registry.svc:5000/openshift/tools:latest
 
-# Kuadrant sometimes misbehaves. Force a job to restart it after a delay post-apply
-restartKuadrant: true
+users:
+  - user1
+  - user2
+  - user3
+  - user4
+  - user5
 
-# Manage optional chart prerequisite setup
-openshift-ai:
-  enabled: true # This will primarily configure the dashboard to support MaaS in this configuration
-keycloak:
-  enabled: false
-  namespace: keycloak
-  removeKubeAdmin: false
-devspaces:
-  enabled: false
-  namespace: openshift-devspaces
-grafana:
-  enabled: false
-  namespace: grafana
-  selectors: {}
-cluster-monitoring:
-  enabled: false
+subscriptions:
+  admin:
+    displayName: MaaS Admins
+    groups:
+      - name: admin
+    tokenRateLimits:
+      nemotron-3-nano-30b-a3b:
+        - limit: 100000
+          window: 1m
+  user:
+    displayName: MaaS Users
+    groups:
+      - name: user
+    tokenRateLimits:
+      nemotron-3-nano-30b-a3b:
+        - limit: 50000
+          window: 1m
 
-tiers:
-  free:
-    users: []
-    requestRates:
-      - limit: 5
-        window: 2m
-    tokenRates:
-      - limit: 100
-        window: 1m
-  premium:
-    users:
-      - user1
-      - user2
-      - user3
-      - user4
-      - user5
-    requestRates:
-      - limit: 20
-        window: 2m
-    tokenRates:
-      - limit: 10000
-        window: 1m
-  enterprise:
-    users:
-      - admin
-    requestRates:
-      - limit: 50
-        window: 2m
-    tokenRates:
-      - limit: 20000
-        window: 1m
-
-workspace:
-  enabled: true
-  namespacePrefix: wksp
-
-  devworkspace:
-    name: exercises
-    projects:
-      repoUrl: https://github.com/rh-ai-quickstart/maas-code-assistant.git
-      revision: main
-    image: registry.redhat.io/devspaces/udi-rhel9:3.25.0
-
-defaultServingImage: registry.redhat.io/rhaiis/vllm-cuda-rhel9:3.3.0
-
-defaultModelTiers:
-  - free
-  - premium
-  - enterprise
-
-modelsNamespace: maas
+modelsNamespace: llm
+defaultServingImage: registry.redhat.io/rhaii/vllm-cuda-rhel9:3.4.0
 models:
-  - name: gpt-oss-20b
-    displayName: OpenAI gpt-oss-20b
-    uri: oci://registry.redhat.io/rhelai1/modelcar-gpt-oss-20b:1.5
-    resources:
-      limits:
-        cpu: "4"
-        memory: 24Gi
-        nvidia.com/gpu: "1"
-      requests:
-        cpu: "2"
-        memory: 16Gi
-        nvidia.com/gpu: "1"
-    extraArgs:
-      - --enable-force-include-usage
-    tolerations:
-      - effect: NoSchedule
-        key: nvidia.com/gpu
-        operator: Exists
   - name: nemotron-3-nano-30b-a3b
     displayName: NVIDIA Nemotron 3 Nano 30B A3B FP8
-    tiers:
-      - premium
-      - enterprise
     uri: oci://quay.io/jharmison/models:redhatai--nvidia-nemotron-3-nano-30b-a3b-fp8-modelcar
+    hardwareProfile:
+      enabled: true
+      name: gpu
+      namespace: redhat-ods-applications
     resources:
       limits:
         cpu: "4"
@@ -109,14 +48,88 @@ models:
         memory: 16Gi
         nvidia.com/gpu: "1"
     extraArgs:
-      - --enable-force-include-usage
       - --max-model-len=131072
       - --enable-auto-tool-choice
       - --tool-call-parser=qwen3_coder
       - --trust-remote-code
+      - --enable-force-include-usage
       - --reasoning-parser-plugin=/mnt/models/nano_v3_reasoning_parser.py
       - --reasoning-parser=nano_v3
     tolerations:
       - effect: NoSchedule
         key: nvidia.com/gpu
         operator: Exists
+
+# This default aligns with g6e.2xlarge instances
+hardwareProfiles:
+  gpu:
+    node:
+      tolerations:
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+          operator: Exists
+    displayName: NVIDIA GPU
+    cpu:
+      min: 2
+      max: 6
+      default: 2
+    memory:
+      min: 2Gi
+      max: 48Gi
+      default: 16Gi
+    gpu:
+      nvidia.com/gpu:
+        max: 1
+        displayName: NVIDIA L40s
+
+dashboardConfig:
+  genAiStudio: true
+  modelAsService: true
+  maasAuthPolicies: true
+  observabilityDashboard: true
+
+clusterMonitoring:
+  enabled: false
+  config:
+    enableUserWorkload: true
+    prometheusK8s:
+      retention: 168h
+      volumeClaimTemplate:
+        spec:
+          volumeMode: Filesystem
+          resources:
+            requests:
+              storage: 40Gi
+  userConfig:
+    prometheus:
+      retention: 72h
+      volumeClaimTemplate:
+        spec:
+          volumeMode: Filesystem
+          resources:
+            requests:
+              storage: 40Gi
+
+# Kuadrant sometimes misbehaves. Force a job to restart it after a delay post-apply
+kuadrant:
+  restart: false
+  namespace: kuadrant-system
+
+keycloak:
+  enabled: false
+  namespace: keycloak
+  removeKubeAdmin: false
+
+devspaces:
+  enabled: false
+  namespace: openshift-devspaces
+
+workspace:
+  enabled: true
+  namespacePrefix: wksp
+  devworkspace:
+    name: exercises
+    projects:
+      repoUrl: https://github.com/rh-ai-quickstart/maas-code-assistant.git
+      revision: main
+    image: registry.redhat.io/devspaces/udi-rhel9:3.25.0

@@ -7,49 +7,48 @@ gateways:
     create: true
     useRoute: false
     hostname: ""
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: "2"
+        memory: 2Gi
+
+dataScienceClusterInitialization:
+  monitoring:
+    metrics:
+      replicas: 1
+      storage:
+        retention: 90d
+        size: 5Gi
 
 dataScienceCluster:
   create: true
   components:
-    aipipelines:
-      argoWorkflowsControllers:
-        managementState: Removed
-      managementState: Removed
     dashboard:
       managementState: Managed
-    feastoperator:
-      managementState: Removed
     kserve:
-      nim:
-        managementState: Removed
       modelsAsService:
         managementState: Managed
-      rawDeploymentServiceConfig: Headless
       managementState: Managed
-    kueue:
-      defaultClusterQueueName: default
-      defaultLocalQueueName: default
-      managementState: Removed
     llamastackoperator:
       managementState: Managed
-    mlflowoperator:
-      managementState: Removed
-    modelregistry:
-      registriesNamespace: rhoai-model-registries
-      managementState: Managed
-    ray:
-      managementState: Removed
-    trainingoperator:
-      managementState: Removed
-    trustyai:
-      eval:
-        lmeval:
-          permitCodeExecution: deny
-          permitOnline: deny
-      managementState: Managed
-    workbenches:
-      workbenchNamespace: rhods-notebooks
-      managementState: Managed
+
+# used for MaaS
+postgresCluster:
+  create: true
+  name: maas
+  namespace: maas-db
+  storage:
+    size: 5Gi
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
 
 rhcl:
   create: true
@@ -81,28 +80,31 @@ install-operators:
       targetNamespaces:
         - openshift-lws-operator
 
-    grafana-operator:
-      enabled: true
-      channel: v5
-      catalog: community-operators
-
     rhods-operator:
       enabled: true
-      channel: stable-3.3
-      installPlanApproval: Manual
-      startingCSV: rhods-operator.3.3.0
+      channel: stable-3.4
       namespace: redhat-ods-operator
+      installPlanApproval: Manual
+      startingCSV: rhods-operator.3.4.0
       operatorGroup:
         enabled: true
 
     rhcl-operator:
       enabled: true
       channel: stable
+      namespace: kuadrant-system
+      installPlanApproval: Manual
+      startingCSV: rhcl-operator.v1.3.4
+      operatorGroup:
+        enabled: true
 
     cloudnative-pg:
       enabled: true
       channel: stable-v1
       catalog: certified-operators
+      namespace: cloudnative-pg
+      operatorGroup:
+        enabled: true
 
     rhbk-operator:
       enabled: true
@@ -112,3 +114,19 @@ install-operators:
         enabled: true
       targetNamespaces:
         - keycloak
+
+    cluster-observability-operator:
+      enabled: true
+      channel: stable
+      namespace: openshift-cluster-observability-operator
+      installPlanApproval: Manual
+      startingCSV: cluster-observability-operator.v1.4.0
+      operatorGroup:
+        enabled: true
+
+    opentelemetry-product:
+      enabled: true
+      channel: stable
+      namespace: opentelemetry-operator
+      operatorGroup:
+        enabled: true

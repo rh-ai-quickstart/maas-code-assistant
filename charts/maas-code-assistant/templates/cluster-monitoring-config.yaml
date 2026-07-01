@@ -1,4 +1,5 @@
-{{- with .Values.clusterMonitoringConfig }}
+{{- if .Values.clusterMonitoring.enabled }}
+{{- with .Values.clusterMonitoring.config }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -13,7 +14,7 @@ data:
   config.yaml: |
     {{- toYaml . | nindent 4 }}
 {{- end }}
-{{- with .Values.userWorkloadMonitoringConfig }}
+{{- with .Values.clusterMonitoring.userConfig }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -25,4 +26,5 @@ metadata:
 data:
   config.yaml: |
     {{- toYaml . | nindent 4 }}
+{{- end }}
 {{- end }}

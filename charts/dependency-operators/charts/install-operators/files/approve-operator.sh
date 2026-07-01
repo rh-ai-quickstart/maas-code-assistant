@@ -3,6 +3,8 @@
 {{- $operator := index . 0 }}
 {{- $config := index . 1 }}
 
+set -ex
+
 function approve_install_plan {
   installplan=$1
   set -x
@@ -10,11 +12,22 @@ function approve_install_plan {
   { set +x ; } 2>/dev/null
 }
 
+
 function find_install_plan {
-  oc get installplan -l operators.coreos.com/{{ $operator }}.{{ $config.namespace | default "openshift-operators" }} -ojsonpath='{.items[?(@.spec.clusterServiceVersionNames contains "{{ $config.startingCSV }}")].metadata.name}' 2>/dev/null
+  oc get installplan -ogo-template='
+    {{ "{{-" }} range $ip := .items {{ "}}" }}
+      {{ "{{-" }} range .spec.clusterServiceVersionNames {{ "}}" }}
+        {{ "{{-" }} if eq . "{{ $config.startingCSV }}" {{ "}}" }}
+          {{ "{{-" }} if $ip.status {{ "}}" }}
+            {{ "{{-" }} if or (eq $ip.status.phase "RequiresApproval") (eq $ip.status.phase "Complete") {{ "}}" }}
+              {{ "{{-" }} $ip.metadata.name {{ "}}{{" }} break {{ "}}" }}
+            {{ "{{-" }} end {{ "}}" }}
+          {{ "{{-" }} end {{ "}}" }}
+        {{ "{{-" }} end {{ "}}" }}
+      {{ "{{-" }} end {{ "}}" }}
+    {{ "{{-" }} end {{ "}}" }}' 2>/dev/null
 }
 
-echo -n 'Waiting for InstallPlan.'
 while true; do
   install_plan=$(find_install_plan)
   if [ "$install_plan" ]; then
@@ -22,6 +35,5 @@ while true; do
     approve_install_plan "$install_plan"
     break
   fi
-  echo -n '.'
   sleep 1
 done

@@ -1,6 +1,8 @@
+{{- if .Values.devspaces.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.namespace }}
+  name: {{ .Values.devspaces.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
+{{- end }}

@@ -3,28 +3,34 @@
 apiVersion: serving.kserve.io/v1alpha1
 kind: LLMInferenceService
 metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.modelsNamespace }}
   annotations:
-    alpha.maas.opendatahub.io/tiers: {{ toJson (.tiers | default $.Values.defaultModelTiers) | quote }}
-    openshift.io/display-name: {{ .displayName }}
+    openshift.io/display-name: {{ .displayName | default (.name | replace "-" " " | title) }}
     opendatahub.io/model-type: generative
-    security.opendatahub.io/enable-auth: "true"
+    opendatahub.io/genai-use-case: {{ .useCase | default "code-assistant" }}
+    {{-  with .hardwareProfile }}
+    {{- if .enabled }}
+    opendatahub.io/hardware-profile-name: {{ .name }}
+    opendatahub.io/hardware-profile-namespace: {{ .namespace }}
+    {{- end }}
+    {{- end }}
   labels:
     {{- include "maas-code-assistant.labels" $ | nindent 4 }}
     opendatahub.io/dashboard: "true"
     opendatahub.io/genai-asset: "true"
-  name: {{ .name }}
-  namespace: {{ $.Values.modelsNamespace }}
 spec:
   model:
     name: {{ .name }}
     uri: {{ .uri }}
-  replicas: 1
+  replicas: {{ .replicas | default 1 }}
   router:
     gateway:
       refs:
         - name: maas-default-gateway
           namespace: openshift-ingress
     route: {}
+    scheduler: {}
   template:
     containers:
       - name: main
@@ -43,6 +49,7 @@ spec:
           - --enable-ssl-refresh
           - --ssl-certfile=/var/run/kserve/tls/tls.crt
           - --ssl-keyfile=/var/run/kserve/tls/tls.key
+          - --enable-force-include-usage
           {{- with .extraArgs }}
           {{- toYaml . | nindent 10 }}
           {{- end }}

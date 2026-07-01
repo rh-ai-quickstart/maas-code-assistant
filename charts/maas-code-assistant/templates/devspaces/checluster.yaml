@@ -1,8 +1,9 @@
+{{- if .Values.devspaces.enabled }}
 apiVersion: org.eclipse.che/v2
 kind: CheCluster
 metadata:
   name: devspaces
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.devspaces.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 spec:
@@ -11,3 +12,4 @@ spec:
   devEnvironments:
     startTimeoutSeconds: 1200
     secondsOfInactivityBeforeIdling: -1
+{{- end }}

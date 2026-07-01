@@ -2,7 +2,7 @@ keycloak:
   enabled: true
 devspaces:
   enabled: true
-grafana:
+clusterMonitoring:
   enabled: true
-cluster-monitoring:
-  enabled: true
+kuadrant:
+  restart: true

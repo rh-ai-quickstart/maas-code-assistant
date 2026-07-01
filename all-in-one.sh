@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 cd "$(dirname "$(realpath "$0")")"
@@ -16,11 +16,25 @@ if [ -z "$ADMIN_PASSWORD" ]; then
   echo
   echo "ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"" >> .env
 fi
+export ADMIN_PASSWORD
 if [ -z "$USER_PASSWORD" ]; then
   read -rsp 'Enter a password to set for the generated users (user1-user5 by default): ' USER_PASSWORD
   echo
   echo "USER_PASSWORD=\"$USER_PASSWORD\"" >> .env
 fi
+export USER_PASSWORD
+if [ -z "$REMOVE_KUBE_ADMIN" ]; then
+  read -rn 1 -p 'Do you want to remove the kubeadmin user, if it exists? [y/N]: ' answer
+  if [ "${answer,,}" = "y" ]; then
+    echo "Removing kubeadmin while stitching up keycloak..." >&2
+    REMOVE_KUBE_ADMIN=true
+  else
+    echo "Leaving kubeadmin user..." >&2
+    REMOVE_KUBE_ADMIN=false
+  fi
+  echo "REMOVE_KUBE_ADMIN=\"$REMOVE_KUBE_ADMIN\"" >> .env
+fi
+export REMOVE_KUBE_ADMIN
 
 function noisy {
   local censored=()
@@ -81,6 +95,16 @@ else
   GATEWAY_USE_ROUTE=false
 fi
 export GATEWAY_USE_ROUTE
+
+MONITORING_CONFIG=true
+if oc get configmap -n openshift-monitoring cluster-monitoring-config >/dev/null 2>&1; then
+  echo "WARNING: Detected an existing cluster monitoring config. Ensure user-workload monitoring is enabled yourself for metrics to work!" >&2
+  MONITORING_CONFIG=false
+fi
+export MONITORING_CONFIG
+
+KEYCLOAK_CLIENT_SECRET=$(LC_ALL=C tr -dc 'A-Za-z0-9_!@#$%^&*()\-+=' < /dev/urandom | head -c32)
+export KEYCLOAK_CLIENT_SECRET
 
 if [ -f environment.yaml ]; then
   if ! grep -qF "$INGRESS_DOMAIN" environment.yaml; then

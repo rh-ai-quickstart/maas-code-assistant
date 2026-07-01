@@ -1,0 +1,17 @@
+{{- range .Values.models }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: connection-{{ .name }}
+  namespace: {{ $.Values.modelsNamespace }}
+  annotations:
+    opendatahub.io/connection-hidden: "true"
+    opendatahub.io/connection-type-protocol: uri
+    opendatahub.io/connection-type-ref: uri-v1
+  labels:
+    {{- include "maas-code-assistant.labels" $ | nindent 4 }}
+    opendatahub.io/dashboard: "true"
+type: Opaque
+data:
+  URI: {{ .uri | b64enc }}
+{{- end }}

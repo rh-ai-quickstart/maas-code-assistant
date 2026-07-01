@@ -1,8 +1,0 @@
-apiVersion: user.openshift.io/v1
-kind: Group
-metadata:
-  name: keycloak-cluster-admins
-  labels:
-    {{- include "maas-code-assistant.labels" . | nindent 4 }}
-users:
-  - {{ .Values.realm.admin.username }}

@@ -49,11 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "maas-code-assistant.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{- define "maas-code-assistant.users" -}}
-["{{- join "\",\"" (concat
-  (.Values.tiers.free.users | default list)
-  (.Values.tiers.premium.users | default list)
-  (.Values.tiers.enterprise.users | default list)
-) }}"]
-{{- end }}

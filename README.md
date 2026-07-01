@@ -48,29 +48,28 @@ _This diagram illustrates a models-as-a-service architecture on Red Hat AI inclu
 to the code assistant application with OpenShift DevSpaces. For more details click
 [here](docs/images/code-assist-diagram.jpg)._
 
-| Layer/Component             | Technology                  | Purpose/Description                                                                                                                                              |
-| --------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Orchestration**           | Red Hat AI Enterprise       | Container orchestration and comprehensive AI platform                                                                                                            |
-| **Inference**               | vLLM and llm-d              | High performance inference engine for Gen AI model deployment and kubernetes-native distributed inference capabilities with llm-d                                |
-| **LLM**                     | nemotron-3-nano-30b-a3b-fp8 | A quantized 30B-parameter hybrid Mamba-Transformer MoE model with a 1M-token context window, designed for efficient reasoning, chat, and agentic AI applications |
-| **Models-as-a-Service**     | Red Hat AI Enterprise       | Integrated LLM governance layer that provides rate-limited model access with usage tracking and chargeback across teams                                          |
-| **GPU Acceleration**        | NVIDIA GPU Operator         | Enables GPUs and manages drivers, DCGM, container toolkit, and MIG capabilities for GPU acceleration                                                             |
-| **Development Environment** | OpenShift DevSpaces         | Provides IDE instances for development teams to develop and deploy all on the same cluster                                                                       |
-| **Observability**           | Prometheus Operator         | Monitors model inference metrics and GPU telemetry                                                                                                               |
-| **Dashboard**               | Grafana                     | Metrics scraped from Prometheus are then surfaced and shown visually in custom Grafana dashboards                                                                |
+| Layer/Component             | Technology                               | Purpose/Description                                                                                                                                                |
+| --------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Orchestration**           | Red Hat AI Enterprise                    | Container orchestration and comprehensive AI platform                                                                                                              |
+| **Inference**               | vLLM and llm-d                           | High performance inference engine for Gen AI model deployment and kubernetes-native distributed inference capabilities with llm-d                                  |
+| **LLM**                     | nemotron-3-nano-30b-a3b-fp8              | A quantized 30B-parameter hybrid Mamba-Transformer MoE model with a 256k-token context window, designed for efficient reasoning, chat, and agentic AI applications |
+| **Models-as-a-Service**     | Red Hat AI Enterprise                    | Integrated LLM governance layer that provides rate-limited model access with usage tracking and chargeback across teams                                            |
+| **GPU Acceleration**        | NVIDIA GPU Operator                      | Enables GPUs and manages drivers, DCGM, container toolkit, and MIG capabilities for GPU acceleration                                                               |
+| **Development Environment** | OpenShift DevSpaces                      | Provides IDE instances for development teams to develop and deploy all on the same cluster                                                                         |
+| **Observability**           | Prometheus Operator                      | Monitors model inference metrics and GPU telemetry                                                                                                                 |
+| **Dashboard**               | OpenShift Cluster Observability Operator | Metrics scraped from Prometheus are then surfaced and shown visually in Perses Dashboards, embedded right in the OpenShift AI console                              |
 
 ## Requirements
 
 ### Minimum hardware requirements
 
 - One NVIDIA GPU node with at least 48GB VRAM for Nemotron model
-- One NVIDIA GPU node with at least 48GB VRAM for gpt-oss model
 
-**Note**: Models in this quickstart were tested with 2 L40S GPU instances on AWS (instance type g6e.2xlarge).
+**Note**: Models in this quickstart were tested with L40S GPU instances on AWS (instance type g6e.2xlarge).
 
 ### Minimum software requirements
 
-- Red Hat OpenShift 4.20
+- Red Hat OpenShift 4.20+
 - Helm CLI
 - OpenShift Client CLI
 - Bash shell available in PATH
@@ -95,20 +94,21 @@ deploying the quickstart with more control._
 
 - OpenShift cluster (specific version is specified in the software requirements section)
   - Optional (recommended): trusted certificates managed for the OpenShift Router,
-    [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/configuring-certificates#replacing-default-ingress_replacing-default-ingress)
+    [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/security_and_compliance/configuring-certificates#replacing-default-ingress_replacing-default-ingress)
 - A default
-  [StorageClass](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/understanding-persistent-storage)
+  [StorageClass](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/storage/understanding-persistent-storage)
   needs to be configured. If your cluster is on a cloud provider, this is probably available out of the box. If you're
   on bare metal or some hypervisor environments, you may need to install additional operators to enable a default
   StorageClass. See the documentation for
   [OpenShift Data Foundation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation) or the
-  [LVM Storage Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
+  [LVM Storage Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
   documentation for installation on bare metal
 - OpenShift cluster has GPUs available
 - The NVIDIA GPU Operator is installed and configured with a ClusterPolicy (or other API) to configure the driver and
   make the resources available to Kubernetes to schedule
 - You do not have other workloads or configurations in the cluster, meaning:
-  - An identity provider is not deployed or configured
+  - An identity provider is not deployed or configured (unless you make some custom changes to the Helm values files to
+    adapt to your users)
   - Red Hat OpenShift AI is not installed
   - Red Hat Connectivity Link is not deployed or configured
   - Red Hat OpenShift Dev Spaces is not deployed
@@ -133,8 +133,9 @@ cd maas-code-assistant
 oc whoami
 ```
 
-4. Run all-in-one.sh. Enter passwords for the admin and user accounts when prompted (these will be saved in the `.env`
-   file after the first run of the script, and you won't be prompted again).
+4. Run all-in-one.sh. Enter passwords for the admin and user accounts when prompted, and decide whether you'd like the
+   charts to remove the built-in `kube:admin` user to simplify login (these will be saved in the `.env` file after the
+   first run of the script, and you won't be prompted again).
 
 ```
 ./all-in-one.sh
@@ -142,11 +143,9 @@ oc whoami
 
 <!-- prettier-ignore -->
 > [!NOTE]
-> This installation will leave the `kubeadmin` user in your cluster, prompting you to select a source to log in
-> from. The `rhbk` option added to this menu is required to use the users and passwords specified above, and to be able
-> to use MaaS models. If you would like to remove the prompt to select an identity provider and have it default to the
-> Red Hat build of Keycloak, you can edit `environment.yaml.tpl` and set `keycloak.removeKubeAdmin` to `true` before
-> running the script.
+> This installation will leave the `kubeadmin` user in your cluster by default, prompting you to select a source to log
+> in from. The `rhbk` option added to this menu is required to use the users and passwords specified above, and to be
+> able to use MaaS models.
 
 ### Delete
 
@@ -157,7 +156,7 @@ helm uninstall maas-code-assistant
 ```
 
 To clean up the dependencies, such as
-[OpenShift AI](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/installing_and_uninstalling_openshift_ai_self-managed/uninstalling-openshift-ai-self-managed_uninstalling-openshift-ai-self-managed),
+[OpenShift AI](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/installing_and_uninstalling_openshift_ai_self-managed/uninstalling-openshift-ai-self-managed_uninstalling-openshift-ai-self-managed),
 follow their documented uninstallation procedures by removing their Operands first, allowing the operators to reconcile
 and complete removal, before uninstalling the operators themselves.
 
@@ -191,33 +190,39 @@ Use this deployment path if you:
 The following prerequisites are required in your environment to prevent any conflicts with the quickstart:
 
 - Users have been configured with OpenShift OAuth, backed by OIDC or some other auth method such as htpasswd,
-  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/postinstallation_configuration/post-install-preparing-for-users).
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/postinstallation_configuration/post-install-preparing-for-users).
 - OpenShift cluster and user-workload monitoring is configured,
-  [as documented](https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.20/html-single/configuring_user_workload_monitoring/index).
-- Grafana is deployed and managed through the Grafana Operator, in the `grafana` namespace.
-  - An example Grafana operand, with all RBAC and resources wired up to User Workload Monitoring, is available in
-    [docs/examples/grafana.yaml](docs/examples/grafana.yaml). It expects that your Grafana Operator installation was
-    namespace scoped, and deployed to the `grafana` namespace, and that your in-cluster registry is configured
-    [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/registry/setting-up-and-configuring-the-registry).
-    You can configure it differently to not depend on the registry.
+  [as documented](https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.22/html-single/configuring_user_workload_monitoring/index).
+- The OpenShift Cluster Observability Operator has been deployed
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_cluster_observability_operator/1-latest/html/installing_red_hat_openshift_cluster_observability_operator/index).
+  - You need to pin this to version 1.4.0 during the installation. 1.5.0 has some incompatibilities that will be
+    resolved in a later release.
 - Red Hat OpenShift Dev Spaces is deployed,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.26/html-single/administration_guide/index#installing-devspaces-on-openshift-using-the-web-console).
   - A basic CheCluster resource is configured, as in steps 2 and 3 of the above.
 - The cert-manager Operator for Red Hat OpenShift has been deployed
-  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift).
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift).
 - The Leader Worker Set Operator has been deployed,
-  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ai_workloads/leader-worker-set-operator#lws-install-operator_lws-managing).
-- Red Hat OpenShift AI version 3.3.0 has been deployed from the fast-3.x, stable-3.x, or stable-3.3 channels,
-  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
-  - A Data Science Cluster has been created that enables at least the Dashboard, KServe, and Llama Stack Operator
+  [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/ai_workloads/leader-worker-set-operator#lws-install-operator_lws-managing).
+- Red Hat OpenShift AI version 3.4 has been deployed from the stable-3.x or stable-3.4 channels,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
+  - The `DSCInitialization` has been modified to enable OpenShift AI metrics,
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/managing_openshift_ai/managing-observability_managing-rhoai#enabling-the-observability-stack_managing-rhoai).
+  - A `DataScienceCluster` has been created that enables at least the Dashboard, KServe, and Llama Stack Operator
     components,
-    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-and-managing-openshift-ai-components_component-install).
-  - Note that using **Manual** approval mode with the **startingCSV** set to `rhods-operator.3.3.0` is recommended to
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-and-managing-openshift-ai-components_component-install),
+    with the KServe `modelsAsService.managementState` configured to `Managed`,
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#maas-prerequisites_maas-deploy:~:text=Component%20requirements.-,MaaS%20configuration%3A,-You%20have%20set).
+  - Note that using **Manual** approval mode with the **startingCSV** set to `rhods-operator.3.4.0` is recommended to
     stay on the version tested with this code base.
-- Red Hat Connectivity Link has been deployed from the stable channel,
-  [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/rhcl-install-ocp-web-console_connectivity-link).
-  - A `Kuadrant` resource has been installed in the `kuadrant-system` namespace,
-    [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.2/html/installing_on_openshift_container_platform/install-on-ocp-cmd_connectivity-link#:~:text=To%20create%20your%20Connectivity%20Link%20deployment%2C%20enter%20the%20following%20command%3A).
+- Red Hat Connectivity Link has been deployed from the stable channel, but pinned to version 1.3.4 or earlier with the
+  upgrade mode configured to `Manual`,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.3/html/installing_connectivity_link/rhcl-install-on-ocp).
+  - It's possible to install this operator into a different namespace than the default, and this may help with
+    deconflicting from OpenShift Service Mesh versions managed by the OpenShift Ingress ClusterOperator's Gateway API
+    installation.
+  - A `Kuadrant` resource has been installed in the `kuadrant-system` namespace with Observability features enabled,
+    [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.3/html/observability/rhcl-observability#rhcl-enable-observability-monitor_rhcl-observability).
   - The `Authorino` resource that gets created from this `Kuadrant` instance has been modified with the following to
     enable TLS on the Authorino endpoint:
     ```
@@ -225,12 +230,16 @@ The following prerequisites are required in your environment to prevent any conf
     oc patch authorino -n kuadrant-system authorino --type=merge --patch '{"spec": {"listener": {"tls": {"enabled": true, "certSecretRef": {"name": "authorino-server-cert"}}}}}'
     ```
 - You have created the `openshift-default` **GatewayClass** object for Gateway API in OpenShift, and are able to create
-  Gateway instances using your cluster's load balancer and infrastructure configuration. See
-  [the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#ingress-gateway-api)
-  for more details about Gateway API in OpenShift.
+  Gateway instances using your cluster's load balancer and infrastructure configuration.
+  - See
+    [the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#ingress-gateway-api)
+    for more details about Gateway API in OpenShift.
+  - An example infrastructure that requires other pre-work or consideration is bare-metal installation. See the
+    [section of the documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/ingress_and_load_balancing/configuring-gateway-api#on-premise-gateway-routing-requirements_assigning-network-addresses-gateways)
+    on this topic for more details.
 - You have created the `maas-default-gateway` **Gateway** object in the `openshift-ingress` namespace using an
   infrastructure configuration that is supported for your environment and it shows that it is programmed, when verified
-  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#prerequisite-verification_maas-deploy).
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#maas-prerequisites_maas-deploy).
   It additionally needs the `opendatahub.io/managed: "false"` label and the `opendadatahub.io/managed: "false"` and
   `security.opendatahub.io/authorino-tls-bootstrap: "true"` annotations set. Without these, policy enforcement will not
   work as expected.
@@ -238,6 +247,16 @@ The following prerequisites are required in your environment to prevent any conf
     [charts/dependency-operators/files/openshift-ai/gateway.yaml](charts/dependency-operators/files/openshift-ai/gateway.yaml).
     You can use this template as the basis of a custom manifest by removing the templating syntax and configuring it to
     suit your environment.
+- You have a PostgreSQL version 14 or later database available for use with MaaS, and have created a secret with the
+  connection URI in the `redhat-ods-applications` namespace,
+  [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#configure-postgresql-secret-for-maas_maas-deploy).
+  - An example to deploy a PostgreSQL cluster and provision a database on it, using the Certified CloudNativePG operator
+    from [EDB](https://www.enterprisedb.com/), is available as a Helm template in this repository at
+    [charts/dependency-operators/files/openshift-ai/cluster.yaml](charts/dependency-operators/files/openshift-ai/cluster.yaml).
+    You can use this template as the basis of a custom manifest by removing the templating syntax and configuring it
+    according to [the documentation](https://cloudnative-pg.io/docs/1.29/bootstrap#bootstrap-an-empty-cluster-initdb).
+    - CloudNativePG can be installed from Operator Hub by navigating to Ecosystem and Software Catalog in the left
+      navigation bar on your OpenShift Console. It's discoverable easily by searching for `cnpg`.
 
 ### Installation Steps
 
@@ -262,6 +281,8 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
       oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.status.domain}{"\n"}'
       oc get ingresscontroller -n openshift-ingress-operator default -ojsonpath='{.spec.defaultCertificate.name}{"\n"}'
       ```
+      2. If the second command doesn't return anything for the `defaultCertificate.name`, OpenShift uses the default
+         name of `router-certs-default`, which is why it is set as the default.
 
    2. If you are on a bare metal or non-cloud hypervisor environment, your integrated image registry might be disabled.
       If it is, update `global.toolsImage` to refer to a container image that at least contains `oc`.
@@ -270,47 +291,52 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
       ```
       oc adm release info --image-for=tools
       ```
-
-   3. `grafana.namespace` and `grafana.selectors`
-      1. Use the Namespace of your `Grafana` resource for the Grafana Operator.
-      2. Set `selectors` to match labels on your `Grafana` instance. For example, if you get the following output:
+      1. To check if your integrated registry is available, you can run the following command:
 
       ```
-      oc get grafana grafana -n grafana -ojsonpath='{.metadata.labels}' | jq .
+      oc get configs.imageregistry.operator.openshift.io cluster -ogo-template='{{ range .status.conditions }}{{ if eq .type "Available" }}{{ .status }}{{ "\n" }}{{ end }}{{ end }}'
       ```
 
-      `{`\
-      `  “app”: “grafana”`\
-      `}`\
-      You should set `selectors` to `app: grafana`.
-
-5. Update the `tiers` section to map your desired user/tier mapping for the default MaaS tiers.
-   1. For example, if you have users named “bob,” “sue,” and “tom,” and would like them all to be in the enterprise
-      tier, with user “sally” in the premium tier and “frank” in the free tier, use the following value for `tiers`:
+5. Update the `subscriptions` sections to map your desired group and rate-limit mapping for your MaaS subscriptions.
+   1. For example, if you have a Group in OpenShift named `okta-users` and would like all members of this group to have
+      rate limits of 50,000 total tokens per minute, with 1,000,000 tokens per hour (to allow for bursty usage), use the
+      following value for `subscriptions`:
 
    ```
-   tiers:
-     free:
-       users:
-         - frank
-     premium:
-       users:
-         - sally
-     enterprise:
-       users:
-         - bob
-         - sue
-         - tom
+   subscriptions:
+    user:
+      displayName: MaaS Users
+      groups:
+        - name: okta-users
+      tokenRateLimits:
+        nemotron-3-nano-30b-a3b:
+          - limit: 50000
+            window: 1m
+          - limit: 1000000
+            window: 1h
    ```
 
-   2. If you would like to change the request rates and token rates as well, feel free to do so.
+   2. If you would like to create multiple
+      [MaaS Subscriptions](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/govern_llm_access_with_models-as-a-service/deploy-and-manage-models-as-a-service_maas#managing-maas-subscriptions-dashboard_maas-deploy)
+      for different groups to have access to self-service API keys at different rate limits, feel free to do so.
 
-6. Complete any tweaks necessary to the `models` array to ensure the workloads will place on your GPU-enabled nodes.
+6. Ensure any OpenShift Users you want to be have Dev Spaces configured for have been added to the `users` array
+
+7. Complete any tweaks necessary to the `models` array to ensure the workloads will place on your GPU-enabled nodes.
    This may involve changing the tolerations, adjusting the resources, adding the `nodeSelector` field to each model and
    configuring it with a valid `nodeSelector` for the
-   [pod template](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors), etc.
+   [pod template](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors), etc. It is
+   not recommended that you change other options, such as the `extraArgs` array to ensure that the model is correctly
+   configured for agentic code assistance tasks to complete the user tasks.
+   1. Note that the `hardwareProfile` section of the model currently points to the chart-managed HardwareProfile, which
+      is configured in the `hardwareProfiles` section of the values. This is to integrate the API-managed resources with
+      the OpenShift AI dashboard, where HardwareProfiles are typically consumed. You can disable HardwareProfile
+      association with your models safely if you don't want to do additional tuning to the hardwareProfiles, and can set
+      the top-level values key for `hardwareProfiles` to `null` to avoid managing them. Alternatively, just make sure
+      that you're using a HardwareProfile name that matches what's configured (whether by the chart or not) to integrate
+      cleanly with the UI.
 
-7. Install the quickstart with helm:
+8. Install the quickstart with helm:
 
 ```
 helm install maas-code-assistant ./charts/maas-code-assistant -f environment.yaml

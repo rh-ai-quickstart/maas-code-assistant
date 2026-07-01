@@ -1,0 +1,19 @@
+{{- with $cluster := .Values.postgresCluster }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ $cluster.name }}
+  namespace: {{ $cluster.namespace }}
+spec:
+  instances: {{ $cluster.instances | default 1 }}
+  storage:
+    {{- toYaml ($cluster.storage | default ("{\"size\": \"2Gi\"}" | fromJson)) | nindent 6 }}
+  bootstrap:
+    initdb:
+      database: {{ $cluster.name }}
+      owner: {{ $cluster.name }}
+  {{- with $cluster.resources }}
+  resources:
+    {{- toYaml . | nindent 6 }}
+  {{- end }}
+{{- end }}
