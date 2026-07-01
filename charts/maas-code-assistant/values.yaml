@@ -108,7 +108,7 @@ clusterMonitoring:
 
 # Kuadrant sometimes misbehaves. Force a job to restart it after a delay post-apply
 kuadrant:
-  restart: true
+  restart: false
   namespace: kuadrant-system
 
 keycloak:

@@ -202,7 +202,7 @@ The following prerequisites are required in your environment to prevent any conf
   [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift).
 - The Leader Worker Set Operator has been deployed,
   [as documented](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ai_workloads/leader-worker-set-operator#lws-install-operator_lws-managing).
-- Red Hat OpenShift AI version 3.4.0 has been deployed from the stable-3.x or stable-3.4 channels,
+- Red Hat OpenShift AI version 3.4 has been deployed from the stable-3.x or stable-3.4 channels,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-deploying-openshift-ai_install#installing-the-openshift-ai-operator_operator-install).
   - The `DSCInitialization` has been modified to enable OpenShift AI metrics,
     [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html/managing_openshift_ai/managing-observability_managing-rhoai#enabling-the-observability-stack_managing-rhoai).
@@ -216,6 +216,9 @@ The following prerequisites are required in your environment to prevent any conf
 - Red Hat Connectivity Link has been deployed from the stable channel, but pinned to version 1.3.4 or earlier with the
   upgrade mode configured to `Manual`,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.3/html/installing_connectivity_link/rhcl-install-on-ocp).
+  - It's possible to install this operator into a different namespace than the default, and this may help with
+    deconflicting from OpenShift Service Mesh versions managed by the OpenShift Ingress ClusterOperator's Gateway API
+    installation.
   - A `Kuadrant` resource has been installed in the `kuadrant-system` namespace with Observability features enabled,
     [as documented](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/1.3/html/observability/rhcl-observability#rhcl-enable-observability-monitor_rhcl-observability).
   - The `Authorino` resource that gets created from this `Kuadrant` instance has been modified with the following to
