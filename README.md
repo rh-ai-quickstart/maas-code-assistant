@@ -291,6 +291,11 @@ cp charts/maas-code-assistant/values.yaml environment.yaml
       ```
       oc adm release info --image-for=tools
       ```
+      1. To check if your integrated registry is available, you can run the following command:
+
+      ```
+      oc get configs.imageregistry.operator.openshift.io cluster -ogo-template='{{ range .status.conditions }}{{ if eq .type "Available" }}{{ .status }}{{ "\n" }}{{ end }}{{ end }}'
+      ```
 
 5. Update the `subscriptions` sections to map your desired group and rate-limit mapping for your MaaS subscriptions.
    1. For example, if you have a Group in OpenShift named `okta-users` and would like all members of this group to have
