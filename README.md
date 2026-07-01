@@ -195,6 +195,8 @@ The following prerequisites are required in your environment to prevent any conf
   [as documented](https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.20/html-single/configuring_user_workload_monitoring/index).
 - The OpenShift Cluster Observability Operator has been deployed
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_cluster_observability_operator/1-latest/html/installing_red_hat_openshift_cluster_observability_operator/index).
+  - You need to pin this to version 1.4.0 during the installation. 1.5.0 has some incompatibilities that will be
+    resolved in a later release.
 - Red Hat OpenShift Dev Spaces is deployed,
   [as documented](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.26/html-single/administration_guide/index#installing-devspaces-on-openshift-using-the-web-console).
   - A basic CheCluster resource is configured, as in steps 2 and 3 of the above.
