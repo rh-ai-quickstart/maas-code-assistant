@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: patch-oauth-{{ .Values.name }}
-  namespace: openshift-authentication
+  namespace: {{ .Values.oauthPatch.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 ---
@@ -19,13 +19,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: patch-oauth-{{ .Values.name }}
-    namespace: openshift-authentication
+    namespace: {{ .Values.oauthPatch.namespace }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: patch-oauth-{{ .Values.name }}-script
-  namespace: openshift-authentication
+  namespace: {{ .Values.oauthPatch.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
 data:
@@ -35,7 +35,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: patch-oauth-{{ .Values.name }}
-  namespace: openshift-authentication
+  namespace: {{ .Values.oauthPatch.namespace }}
   labels:
     {{- include "maas-code-assistant.labels" . | nindent 4 }}
   annotations:

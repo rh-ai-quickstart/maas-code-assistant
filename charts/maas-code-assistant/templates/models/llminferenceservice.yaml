@@ -80,7 +80,7 @@ spec:
     nodeSelector:
       {{- toYaml . | nindent 6 }}
     {{- end }}
-    {{- with .tolerations }}
+    {{- with (ternary $.Values.gpuTolerations .tolerations (gt (len $.Values.gpuTolerations) 0)) }}
     tolerations:
       {{- toYaml . | nindent 6 }}
     {{- end }}

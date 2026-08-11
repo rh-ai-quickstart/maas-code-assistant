@@ -1,0 +1,360 @@
+# yaml-language-server: $schema=quickstart-manifest.schema.json
+
+apiVersion: quickstart.redhat.com/v1
+kind: Quickstart
+
+metadata:
+  name: maas-code-assistant
+  displayName: "MaaS Code Assistant with NVIDIA"
+  shortDescription: "Optimize private app development using NVIDIA Nemotron models through Models-as-a-Service on your own multi-tenant infrastructure in Red Hat AI."
+  longDescription: |
+    Developing software with speed and efficiency is a competitive necessity. Developers are often
+    overwhelmed and slowed down by repetitive code, complicated debugging and testing, and the
+    constant need to learn new technologies. AI-powered coding assistance can help, but how do you
+    leverage it securely and cost-effectively?
+
+    For organizations restricted by strict data privacy requirements, regulations, or specific
+    performance needs, public AI hosted services often are not an option. As your usage expands,
+    you also need to consider how to keep things as cost-efficient as possible. Models as a Service
+    (MaaS) solves this by enabling centralized IT teams to host and manage private models that
+    remote teams can consume easily and securely. This keeps proprietary data within the
+    organization's boundaries while providing developers access to the generative AI technology
+    they need. By providing access to the models via API tokens, administrators can also implement
+    specific rate limits and quotas. This approach doesn't just simplify access and usage, it
+    allows organizations to monitor metrics, forecast capacity and compute needs, and manage
+    chargebacks with precision.
+
+    This quickstart demonstrates how you can easily deploy a private AI code assistant powered by
+    NVIDIA Nemotron models and delivered through Red Hat AI's integrated Models as a Service (MaaS)
+    offering. Developers access the assistant through OpenShift DevSpaces, a containerized
+    cloud-native IDE included in OpenShift.
+  version: "1.0.0"
+  repository: "https://github.com/rh-ai-quickstart/maas-code-assistant"
+  maintainer:
+    name: "Quickstart Team"
+  lastUpdated: "2026-08-05T00:00:00Z"
+
+classification:
+  industries:
+    - "Adopt and scale AI"
+  useCases:
+    - "Code development"
+  aiCapabilities:
+    - "Code generation"
+    - "Agentic AI"
+    - "Inference serving"
+    - "Model governance"
+  technologies:
+    - name: "Red Hat AI"
+      role: "AI platform with Models-as-a-Service governance"
+      partner: "Red Hat"
+    - name: "vLLM"
+      role: "High-performance LLM inference engine"
+      partner: "Community"
+    - name: "llm-d"
+      role: "Kubernetes-native distributed inference framework"
+      partner: "Community"
+    - name: "NVIDIA Nemotron"
+      role: "LLM for code generation and agentic AI"
+      partner: "NVIDIA"
+    - name: "OpenShift DevSpaces"
+      role: "Cloud-native IDE for development teams"
+      partner: "Red Hat"
+    - name: "Keycloak"
+      role: "SSO and identity management"
+      partner: "Red Hat"
+    - name: "Gateway API"
+      role: "Kubernetes-native ingress and traffic management"
+      partner: "Community"
+    - name: "Kuadrant"
+      role: "API rate limiting and policy enforcement"
+      partner: "Red Hat"
+    - name: "Prometheus"
+      role: "Metrics collection and monitoring"
+      partner: "Community"
+    - name: "CloudNativePG"
+      role: "PostgreSQL database operator"
+      partner: "EDB"
+    - name: "NVIDIA GPU Operator"
+      role: "GPU driver and resource management"
+      partner: "NVIDIA"
+  tags:
+    - "Red Hat AI Enterprise"
+    - "Code development"
+    - "Adopt and scale AI"
+    - "NVIDIA"
+    - "MaaS"
+    - "Models as a Service"
+    - "DevSpaces"
+    - "GPU"
+    - "vLLM"
+    - "llm-d"
+  estimatedDeploymentTime: 45
+
+prerequisites:
+  openshift:
+    minimumVersion: "4.20"
+    tested:
+      - "4.22"
+  operators:
+    - name: "Red Hat OpenShift AI"
+      namespace: "cluster"
+      minimumVersion: "3.4.0"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable-3.4 channel with Manual approval pinned to rhods-operator.3.4.0."
+    - name: "Red Hat Connectivity Link"
+      namespace: "cluster"
+      minimumVersion: "1.3.4"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable channel with Manual approval pinned to rhcl-operator.v1.3.4."
+    - name: "Red Hat Build of Keycloak"
+      namespace: "cluster"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable-v26.4 channel for SSO and identity management."
+    - name: "OpenShift Dev Spaces"
+      namespace: "cluster"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable channel to provide cloud-native IDE workspaces."
+    - name: "cert-manager Operator for Red Hat OpenShift"
+      namespace: "cluster"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable-v1 channel for TLS certificate management."
+    - name: "Leader Worker Set Operator"
+      namespace: "cluster"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable-v1.0 channel for distributed inference workloads."
+    - name: "CloudNativePG"
+      namespace: "cluster"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from certified-operators catalog for PostgreSQL database management."
+    - name: "OpenShift Cluster Observability Operator"
+      namespace: "cluster"
+      minimumVersion: "1.4.0"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically with Manual approval pinned to v1.4.0 for Perses dashboards in the OpenShift AI console."
+    - name: "OpenTelemetry Product"
+      namespace: "cluster"
+      required: true
+      autoInstalled: true
+      installationHint: "Installed automatically from the stable channel for telemetry collection."
+    - name: "NVIDIA GPU Operator"
+      namespace: "cluster"
+      required: true
+      autoInstalled: false
+      installationHint: "Must be pre-installed with a ClusterPolicy configured to make GPU resources available to Kubernetes. Required for model inference."
+  resources:
+    minimum:
+      cpu: "3"
+      memory: "17Gi"
+      storage: "92Gi"
+      gpu:
+        count: 1
+        memory: "48Gi"
+    recommended:
+      cpu: "7"
+      memory: "28Gi"
+      storage: "132Gi"
+      gpu:
+        count: 1
+        memory: "48Gi"
+  storageClasses:
+    - name: "any-rwo"
+      accessModes:
+        - "ReadWriteOnce"
+      minimumSize: "92Gi"
+      usage: "PostgreSQL databases (MaaS and Keycloak), Prometheus persistent volumes for monitoring data"
+
+deployment:
+  supportedActions:
+    - "CHECK_PRE_REQS"
+    - "STATUS"
+    - "INSTALL"
+    - "UNINSTALL_DELETE_ALL"
+  supportedModes:
+    - "DEMO"
+  installer:
+    image: "quay.io/rh-ai-quickstart/maas-code-assistant-installer:1.0.0"
+    command: ["/installer/entrypoint.sh"]
+    requiredEnv:
+      - "TARGET_NAMESPACE"
+      - "ACTION"
+      - "INSTALL_MODE"
+      - "ADMIN_PASSWORD"
+      - "USER_PASSWORD"
+    rbac:
+      serviceAccount:
+        name: "maas-code-assistant-installer"
+        namespace: "default"
+      defaultNamespaceRole:
+        name: "maas-code-assistant-installer"
+        namespace: "default"
+        rules:
+          - apiGroups: [""]
+            resources: ["pods", "configmaps"]
+            verbs: ["get", "list", "watch"]
+          - apiGroups: ["batch"]
+            resources: ["jobs"]
+            verbs: ["get", "list", "watch"]
+      defaultNamespaceRoleBinding:
+        name: "maas-code-assistant-installer"
+        namespace: "default"
+        roleRef:
+          kind: "Role"
+          name: "maas-code-assistant-installer"
+        subjects:
+          - kind: "ServiceAccount"
+            name: "maas-code-assistant-installer"
+            namespace: "default"
+      clusterRoleBinding:
+        name: "maas-code-assistant-installer-${TARGET_NAMESPACE}"
+        roleRef:
+          kind: "ClusterRole"
+          name: "cluster-admin"
+        subjects:
+          - kind: "ServiceAccount"
+            name: "maas-code-assistant-installer"
+            namespace: "default"
+  defaultNamespace: "maas-code-assistant"
+  quickstartResources:
+    namespaceScoped:
+      - apiGroups: [""]
+        resources: ["pods", "services", "secrets", "configmaps", "serviceaccounts"]
+        description: "Core resources for model serving, Keycloak, databases, and installer jobs"
+      - apiGroups: ["apps"]
+        resources: ["deployments", "statefulsets"]
+        description: "Application workloads managed by operators"
+      - apiGroups: ["batch"]
+        resources: ["jobs"]
+        description: "Configuration and setup jobs (OAuth patching, dashboard config, operator approval)"
+      - apiGroups: ["route.openshift.io"]
+        resources: ["routes"]
+        description: "Keycloak SSO route and MaaS gateway route"
+      - apiGroups: ["k8s.keycloak.org"]
+        resources: ["keycloaks", "keycloakrealmimports"]
+        description: "Keycloak instance and realm with user accounts"
+      - apiGroups: ["serving.kserve.io"]
+        resources: ["llminferenceservices"]
+        description: "NVIDIA Nemotron model inference services"
+      - apiGroups: ["maas.opendatahub.io"]
+        resources: ["maassubscriptions", "maasauthpolicies", "maasmodelrefs"]
+        description: "MaaS governance resources for rate limiting and model access"
+      - apiGroups: ["workspace.devfile.io"]
+        resources: ["devworkspaces"]
+        description: "Developer IDE workspaces per user"
+      - apiGroups: ["postgresql.cnpg.io"]
+        resources: ["clusters"]
+        description: "PostgreSQL database clusters for MaaS and Keycloak"
+      - apiGroups: ["operators.coreos.com"]
+        resources: ["subscriptions", "operatorgroups"]
+        description: "Operator subscriptions for all dependency operators"
+    clusterScoped:
+      - apiGroups: ["gateway.networking.k8s.io"]
+        resources: ["gateways", "gatewayclasses"]
+        description: "Gateway API resources for MaaS model endpoint ingress"
+      - apiGroups: ["infrastructure.opendatahub.io"]
+        resources: ["hardwareprofiles"]
+        description: "GPU hardware profiles for OpenShift AI dashboard integration"
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        resources: ["clusterrolebindings"]
+        description: "Cluster-level RBAC bindings for admin group and installer jobs"
+
+parameters:
+  secrets:
+    - name: "admin.password"
+      displayName: "Admin Password"
+      description: "Password for the admin user account. This user has cluster-admin access."
+      type: "password"
+      required: true
+      llmGuidance: "REQUIRED - Password for the admin account with cluster-admin privileges. Must be secure. Always ask the user to provide this — never auto-generate or use a default value."
+    - name: "user.password"
+      displayName: "User Password"
+      description: "Password for the demo users (user1 through user5). All demo users share this password."
+      type: "password"
+      required: true
+      llmGuidance: "REQUIRED - Shared password for the 5 demo user accounts (user1-user5). Must be secure. Always ask the user to provide this."
+  configuration:
+    - name: "remove.kubeadmin"
+      displayName: "Remove kubeadmin User"
+      description: "Whether to remove the built-in kubeadmin user after Keycloak SSO is configured. Simplifies login but removes fallback access."
+      type: "boolean"
+      required: false
+      default: false
+      llmGuidance: "Ask the user if they want to remove the kubeadmin user. Warn that this removes fallback access — they should only do this if they are confident the Keycloak SSO configuration is correct. Default to false (keep kubeadmin)."
+
+access:
+  endpoints:
+    - name: "keycloak-console"
+      displayName: "Keycloak SSO Console"
+      type: "route"
+      path: "/admin"
+      description: "Keycloak administration console for managing users, groups, and SSO configuration"
+      public: true
+      authentication: "admin"
+    - name: "maas-gateway"
+      displayName: "MaaS API Gateway"
+      type: "route"
+      path: "/"
+      description: "Models-as-a-Service inference endpoint for accessing NVIDIA Nemotron models via API"
+      public: true
+      authentication: "required"
+    - name: "openshift-console"
+      displayName: "OpenShift Console"
+      type: "route"
+      path: "/"
+      description: "OpenShift platform console with access to DevSpaces workspaces and OpenShift AI dashboard"
+      public: true
+      authentication: "required"
+  defaultCredentials:
+    - name: "Admin User"
+      username: "admin"
+      passwordParameter: "admin.password"
+      description: "Cluster administrator with full access to OpenShift, Keycloak, and MaaS management"
+      roles: ["admin", "cluster-admin"]
+    - name: "Demo Users (user1-user5)"
+      username: "user1"
+      passwordParameter: "user.password"
+      description: "Demo developer accounts with MaaS model access and DevSpaces workspace"
+      roles: ["user"]
+
+cleanup:
+  dataDescription: |
+    This quickstart stores the following data:
+    - PostgreSQL database for MaaS usage tracking and API key management (5Gi in maas-db namespace)
+    - PostgreSQL database for Keycloak user accounts and SSO configuration (2Gi in keycloak namespace)
+    - Prometheus monitoring data for model inference and GPU metrics (up to 80Gi across cluster and user-workload monitoring)
+    - DevSpaces workspace state for each user
+    - Downloaded model weights cached on GPU nodes
+  warning: |
+    Uninstalling removes the quickstart's model deployments, user workspaces, OAuth integration,
+    and monitoring configuration. Operator subscriptions, databases (keycloak, maas-db), and
+    operator namespaces are preserved — other applications may depend on them. To fully remove
+    operators, follow their documented uninstall procedures separately.
+
+documentation:
+  readme: "https://github.com/rh-ai-quickstart/maas-code-assistant/blob/main/README.md"
+
+llmContext:
+  whenToRecommend: |
+    Recommend when users want to set up private AI-powered code assistance for development teams,
+    need to deploy NVIDIA Nemotron models with MaaS governance (rate limiting, usage tracking,
+    chargeback), or are looking for a multi-tenant AI coding environment with DevSpaces integration
+    on Red Hat AI.
+  faq:
+    - question: "What GPU hardware is required?"
+      answer: "You need at least one NVIDIA GPU node with 48GB+ VRAM. The quickstart was tested with L40S GPUs on AWS g6e.2xlarge instances. The NVIDIA GPU Operator must be pre-installed with a configured ClusterPolicy."
+    - question: "Can I use a different model instead of Nemotron?"
+      answer: "Yes. You can modify the models array in the Helm values to deploy different models. Adjust the resources, extraArgs, and tolerations to match your model's requirements. The model must be available as an OCI modelcar image."
+    - question: "How do I configure rate limits for different teams?"
+      answer: "Edit the subscriptions section in the Helm values to define MaaS subscriptions with different token rate limits per group. Each subscription maps OpenShift groups to per-model rate limits (tokens per minute/hour)."
+    - question: "Does this work on bare metal clusters?"
+      answer: "Yes, with additional configuration. You need a default StorageClass (e.g., via LVM Storage Operator or OpenShift Data Foundation), proper Gateway API networking configuration for non-load-balancer environments, and GPU nodes with the NVIDIA GPU Operator."
+    - question: "How do I add more users after initial deployment?"
+      answer: "Add users to the users array in the Helm values and run helm upgrade. New users will get DevSpaces workspaces and be added to the appropriate Keycloak groups for MaaS access."

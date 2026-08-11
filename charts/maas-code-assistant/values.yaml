@@ -28,6 +28,8 @@ subscriptions:
         - limit: 50000
           window: 1m
 
+gpuTolerations: []
+
 modelsNamespace: llm
 defaultServingImage: registry.redhat.io/rhaii/vllm-cuda-rhel9:3.4.0
 models:
