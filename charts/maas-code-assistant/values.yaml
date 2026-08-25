@@ -33,7 +33,7 @@ defaultServingImage: registry.redhat.io/rhaii/vllm-cuda-rhel9:3.4.0
 models:
   - name: nemotron-3-nano-30b-a3b
     displayName: NVIDIA Nemotron 3 Nano 30B A3B FP8
-    uri: oci://quay.io/jharmison/models:redhatai--nvidia-nemotron-3-nano-30b-a3b-fp8-modelcar
+    uri: oci://registry.redhat.io/rhai/modelcar-nvidia-nemotron-3-nano-30b-a3b-fp8:latest
     hardwareProfile:
       enabled: true
       name: gpu
