@@ -85,7 +85,7 @@ install-operators:
       channel: stable-3.4
       namespace: redhat-ods-operator
       installPlanApproval: Manual
-      startingCSV: rhods-operator.3.4.0
+      startingCSV: rhods-operator.3.4.3
       operatorGroup:
         enabled: true
 
@@ -94,7 +94,7 @@ install-operators:
       channel: stable
       namespace: kuadrant-system
       installPlanApproval: Manual
-      startingCSV: rhcl-operator.v1.3.4
+      startingCSV: rhcl-operator.v1.4.2
       operatorGroup:
         enabled: true
 
@@ -108,7 +108,7 @@ install-operators:
 
     rhbk-operator:
       enabled: true
-      channel: stable-v26.4
+      channel: stable-v26.6
       namespace: keycloak
       operatorGroup:
         enabled: true
