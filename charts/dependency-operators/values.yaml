@@ -85,7 +85,7 @@ install-operators:
       channel: stable-3.4
       namespace: redhat-ods-operator
       installPlanApproval: Manual
-      startingCSV: rhods-operator.3.4.3
+      startingCSV: rhods-operator.3.4.4
       operatorGroup:
         enabled: true
 
