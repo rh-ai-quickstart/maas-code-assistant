@@ -144,4 +144,5 @@ noisy -c "$ADMIN_PASSWORD" -c "$USER_PASSWORD" helm upgrade --install -n default
   -f charts/maas-code-assistant/all-dependencies.yaml \
   -f environment.yaml \
   --set keycloak.realm.admin.password="$ADMIN_PASSWORD" \
-  --set keycloak.realm.user.password="$USER_PASSWORD"
+  --set keycloak.realm.user.password="$USER_PASSWORD" \
+  --take-ownership
