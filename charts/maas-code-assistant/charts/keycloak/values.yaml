@@ -23,6 +23,9 @@ realm:
 
 removeKubeAdmin: false
 
+oauthPatch:
+  namespace: openshift-authentication
+
 postgresCluster:
   create: true
   name: keycloak-postgres
