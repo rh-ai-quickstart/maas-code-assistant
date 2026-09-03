@@ -94,7 +94,7 @@ install-operators:
       channel: stable
       namespace: kuadrant-system
       installPlanApproval: Manual
-      startingCSV: rhcl-operator.v1.4.2
+      startingCSV: rhcl-operator.v1.3.4
       operatorGroup:
         enabled: true
 
